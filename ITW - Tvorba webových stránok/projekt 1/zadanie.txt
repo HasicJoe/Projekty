@@ -1,0 +1,35 @@
+
+Zadání projektu 1
+
+    Stáhněte si balík itw_p1.zip a rozbalte na disk. Balík obsahuje stránku itw.html a související obrázky.
+    Vytvořte stylový předpis itw1.css v jazyce CSS tak, aby výsledný vzhled dokumentu odpovídal následujícímu návrhu ve formě obrázku:
+        široké okno
+        normální okno prohlížeče
+        úzké okno
+    (Některé prohlížeče zobrazují obrázky zmenšené, případně kolem nich zobrazují bílé místo. Ujistěte se prosím, že vidíte obrázek v plné velikosti a případné bílé místo kolem něj ignorujte.)
+
+Pokyny ke zpracování
+
+    Dodržte jména souborů.
+    Soubor itw1.html nesmí být změněn.
+    Stránka se musí správně zobrazit v prohlížeči Firefox aktuální verze, ostatní prohlížeče v tomto projektu nemusíte uvažovat.
+    Velikost stránky se musí plynule přizpůsobit šířce okna prohlížeče od 850px výše. V užším okne prohlížeče se může zobrazit horizontální posuvná lišta.
+
+Doplňující informace o návrhu
+
+    Výsledný styl by měl pokud možno věrně odpovídat grafickému návrhu včetně barevnosti, druhů písma a vzájemné polohy a velikosti jednotlivých prvků obsahu. Na druhou stranu není nutné pracovat s přesností na pixely.
+    Balík se zadáním obsahuje veškeré obrázky, které jsou pro vytvoření stylu potřebné. Tyto obrázky není nutné nijak upravovat (řezat apod.)
+    Použitá písma jsou "Montserrat" pro veškerý obsah, "Crimson Text" pro text referencí v části What people say. Orientační velikosti jsou 62px pro hlavní titulek a titulky v "tmavých" sekcích, 32px pro titulky ve světlých sekcích (spacing 0.2em), 16px pro normální písmo dokumentu, 13px pro písmo tlačítek a odkazů v nabídce (spacing 0.8em 0.2em). Dodaný HTML soubor již obsahuje import příslušných písem z Google Fonts, není tedy třeba se starat o získání těchto písem, je však nutné připojení k internetu pro správné zobrazení.
+    Maximální šířka obsahu je 1140px (z toho je padding 15px vlevo i v pravo). V šiším okně se obsah centruje na stránce, pozadí sekcí je vždy přes celou šířku okna (viz. široké okno). Sloupce s textem "The Restaurant" a sloupce v "Events" zabírají 1/3 šířky obsahu, mají však minimální šířku 350px. Pokud by dostupná šířka měla být menší, zobrazí se pod sebou. Sloupce v jídelníčku zabírají 50% šířky, minimálně však 500px, jinak se zobrazí pod sebou. (viz obrázky výše, zejména úzké okno).
+    Titulní sekce (#section-home) s fotografií na pozadí vždy na počátku vyplní 95% výšky okna prohlížeče. Její výška tedy závisí na výšce okna prohlížeče, název restaurace a podtitul jsou v ní horizontálně i vertikálně centrovány.
+        Vyšší okno
+        Nižší okno
+    Tlačítko pod titulkem se při najetí přebarví, jak je vidět v nižším okně. Tip: mohou se hodit délkové jednotky vh a vlastnost background-size.
+    Odkazy nejsou nikde podtržené, při najetí myší se odkazy v textu přebarví na #005dd0 (modrá), odkazy v horní nabídce se nepřebarvují. Standardní barvy:
+        Výchozí barva textu #868e96 (texty na bílém pozadí)
+        Nadpisy na bílém pozadí, názvy jídel v menu: #212529
+        Text na tmavém pozadí: rgba(255, 255, 255, 0.8)
+        Nadpisy na tmavém pozadí: #ffffff
+        Červené odkazy v textu: #005dd0#ee0427
+        What people say: černý text #212529, pozadí #e4f8f4, @nick rgba(0, 0, 0, 0.4). 
+    Pro kulaté obrázky zkuste border-radius: 50%;.

@@ -1,0 +1,192 @@
+#!/bin/sh
+export POSIXLY_CORRECT=yes
+
+print_hash()
+{
+    TERM_L="$1"
+    HASH_CTR="$2"
+    NORMALISE="$3"
+    PRINTED=0
+    LINE=0
+    HASH='#'
+
+    if [ "$NORMALISE" -ne "0" ];then
+        while [ "$PRINTED" -lt "$HASH_CTR" ];do
+            printf "%s" $HASH
+            PRINTED=$((PRINTED+1))
+        done
+        printf "\n" 
+        return
+
+    elif [ "$NORMALISE" -eq "0" ];then
+        TERM_L=$((TERM_L-12))
+        if [ -z "$HASH_CTR" ];then
+            printf "\n"
+            return
+        fi
+        while [ "$PRINTED" -lt "$HASH_CTR" ];do
+            printf "%s" $HASH
+            PRINTED=$((PRINTED+1))
+            LINE=$((LINE+1))
+            if [ "$LINE" -eq "$TERM_L" ];then
+                printf "\n"
+                TERM_L="$1"
+                LINE=0
+            fi
+        done
+    fi
+    printf "\n" 
+}
+
+help()
+{
+    echo "Use ./digraph [-i FILE_ERE] [-n] [DIR]" >&2
+    return 1
+}
+#set switches
+SWITCH_I=0
+SWITCH_N=0
+MULTI_USAGE=1
+FILE_ERE="///NOT_SET///" # primary set of ignored file
+#processing command line arguments 
+while getopts :ni: opt; do
+    case $opt in
+    i)      SWITCH_I=$((SWITCH_I+1))
+            FILE_ERE="$OPTARG"
+            if [ "$SWITCH_I" -gt "$MULTI_USAGE" ];then
+                echo "Multiply use of switch -i" >&2
+                help
+                exit 1
+            fi
+    ;;
+    n)      SWITCH_N=$((SWITCH_N+1))
+            if [ $SWITCH_N -gt $MULTI_USAGE ];then
+            echo "Multiply use of switch -n" >&2
+            help
+            exit 1
+            fi
+    ;;
+    :)      echo "Switch -i need argument" >&2
+            help
+            exit 1
+    ;;
+    *)
+        help
+        exit 1
+    ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+#test if arg is directory
+if [ $# -eq 0 ];then
+    DIRECTORY="$PWD"
+elif [ $# -eq 1 ];then
+    if [ -d "$1" ];then
+        DIRECTORY="$1"
+    else
+        echo "Invalid argument (not directory)" >&2
+        help
+        exit 1
+    fi
+else
+    echo "Many arguments !" >&2
+    help
+    exit 1
+fi
+
+#test if ignored file and root directory are not the same one
+if [ "$DIRECTORY" = "$FILE_ERE" ];then
+    echo "Root directory is same as ignored file !" >&2
+    help
+    exit 1
+fi
+
+#test if script is launched on term
+if [ -t 0 ];then
+    PRINT_LENGTH=$(tput cols) # get the value of term length
+    PRINT_LENGTH=$((PRINT_LENGTH-1))  
+else
+    PRINT_LENGTH=79
+fi
+
+TEMP_SPACE="UNIQUE_DIGRAPH_SPACE_2020"
+DIR_COUNT=$(find "$DIRECTORY" -type d | grep -v "$FILE_ERE" | wc -l)
+FILE_COUNT=$(find "$DIRECTORY" -type f | grep -v "$FILE_ERE" | wc -l)
+SORT_FILES=$(find "$DIRECTORY" -type f  | grep -v "$FILE_ERE" | sed -e 's/ /'$TEMP_SPACE'/g') # remove spaces and add unique substring (to save files correctly)
+HASH_CTR1=0; HASH_CTR2=0; HASH_CTR3=0; HASH_CTR4=0; HASH_CTR5=0 ; HASH_CTR6=0 ; HASH_CTR7=0 ; HASH_CTR8=0 ; HASH_CTR9=0
+
+for path in $SORT_FILES;do
+    case $path in
+    *"$TEMP_SPACE"*)    path="$(echo "$path" | sed -e 's/'$TEMP_SPACE'/ /g' )" # remove substring and return spaces to path
+    ;;
+    esac
+    FILE_S=$(ls -l "$path" | awk '{print $5}')|| echo "Weak access rights to get size of $path" >&2   # find size of current path
+    if [ ! -z "$FILE_S" ]; then
+        if [ "$FILE_S" -lt 100 ];then
+            HASH_CTR1=$((HASH_CTR1+1))
+        elif [ "$FILE_S" -lt 1024 ];then
+            HASH_CTR2=$((HASH_CTR2+1))
+        elif [ "$FILE_S" -lt 10240 ];then
+            HASH_CTR3=$((HASH_CTR3+1))
+        elif [ "$FILE_S" -lt 102400 ];then
+            HASH_CTR4=$((HASH_CTR4+1))
+        elif [ "$FILE_S" -lt 1048576 ];then
+            HASH_CTR5=$((HASH_CTR5+1))
+        elif [ "$FILE_S" -lt 10485760 ];then
+            HASH_CTR6=$((HASH_CTR6+1))
+        elif [ "$FILE_S" -lt 104857600 ];then
+            HASH_CTR7=$((HASH_CTR7+1))
+        elif [ "$FILE_S" -lt 1073741824 ];then
+            HASH_CTR8=$((HASH_CTR8+1))
+        elif [ "$FILE_S" -ge 1073741824 ];then
+            HASH_CTR9=$((HASH_CTR9+1))                     
+        fi
+    fi
+done
+
+# find max if normalisation is set
+if [ "$SWITCH_N" -eq "1" ];then
+    i=1 ; j=1 ; MAX=0;
+    PRINT_LENGTH=$((PRINT_LENGTH-12))
+    while [ "$i" -lt "10" ];do                    #itterate to find max in HASH_CTRS
+        eval FIND_MAX="\$HASH_CTR$i"
+        if [ "$FIND_MAX" -gt "$MAX" ];then
+            MAX=$((FIND_MAX))
+        fi
+        i=$((i+1))
+    done
+    #if maximum is greater than length on line we have to normalise histogram
+    if [ "$MAX" -gt "$PRINT_LENGTH" ];then
+        while [ "$j" -lt "10" ];do
+            if [ "$HASH_CTR$j" -ne "0" ];then
+                eval NORMALISE_CTRS="\$HASH_CTR$j"   # load actual variable to tmp variable we will use in normalise counter
+                eval HASH_CTR$j=$(((NORMALISE_CTRS * PRINT_LENGTH) / MAX))  #set new value of normalise
+            fi
+            j=$((j+1))
+        done
+    fi
+fi
+echo "Root directory: $DIRECTORY" 
+echo "Directories: $DIR_COUNT"
+echo "All files: $FILE_COUNT"
+echo "File size histogram:"
+printf "  <100 B  : "
+print_hash "$PRINT_LENGTH" "$HASH_CTR1" "$SWITCH_N"
+printf "  <1 KiB  : " 
+print_hash "$PRINT_LENGTH" "$HASH_CTR2" "$SWITCH_N"
+printf "  <10 KiB : " 
+print_hash "$PRINT_LENGTH" "$HASH_CTR3" "$SWITCH_N"
+printf "  <100 KiB: "  
+print_hash "$PRINT_LENGTH" "$HASH_CTR4" "$SWITCH_N"
+printf "  <1 MiB  : "
+print_hash "$PRINT_LENGTH" "$HASH_CTR5" "$SWITCH_N" 
+printf "  <10 MiB : " 
+print_hash "$PRINT_LENGTH" "$HASH_CTR6" "$SWITCH_N" 
+printf "  <100 MiB: " 
+print_hash "$PRINT_LENGTH" "$HASH_CTR7" "$SWITCH_N"
+printf "  <1 GiB  : " 
+print_hash "$PRINT_LENGTH" "$HASH_CTR8" "$SWITCH_N"
+printf "  >= GiB  : "
+print_hash "$PRINT_LENGTH" "$HASH_CTR9" "$SWITCH_N"
+exit 0
