@@ -1,0 +1,112 @@
+*{ 
+    font-family: sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #303030;
+    margin:0;
+    padding:0;
+    background-color: #fff;
+    
+}
+a.btn {
+    text-decoration:none;
+    background-color:#f95f3f;
+    color:#fff;
+    border:1 px solid #fff;
+    font-size:16px;
+    width:125px;
+    height:22px;
+    margin-left:30px;
+    margin:auto;
+    text-align:center;
+    
+}
+.btn:hover {
+    background-color:#303030;
+    color:#fff;
+    border:0px;
+    border:1 px solid #fff;
+}
+table { 
+    width: 80%;
+margin:auto;
+border-collapse: collapse;
+margin-top:7vh;
+    
+}
+td, th { padding: 6px;
+border: 1px solid #ccc;
+text-align: left;
+}
+
+h2{
+	background: #303030;
+	text-transform: uppercase;
+	font-family: 'Open Sans Condensed', sans-serif;
+	color: #fff;
+	font-size: 18px;
+	font-weight: 100;
+	padding: 20px;
+	padding-top:45px;
+	margin: -30px -30px 30px -30px;
+  text-align:center;
+  padding-bottom:3vh;  
+}
+.btn {
+  display: inline-block;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+}
+
+@media only screen and (max-width: 760px){
+    table{
+        width:100%;
+        margin-left:auto;
+        margin-right:auto;
+        margin-top:5vh;
+        border:1px solid #eee;
+    }
+    table, thead, tbody, th, td, tr {
+    display: block;
+    }	
+    thead tr { 
+        position: absolute;
+        top: -9999px;
+        left: -9999px;}
+    th{
+        display:none;
+        
+    }
+    tr{
+        border-bottom:0.5px solid #303030;
+        
+    }
+    .page-header,p{
+        text-align: center;
+        
+    }
+    h2 {
+        width:100%;
+        margin:0;
+        padding-top:20px;
+        padding-bottom:20px;
+        padding-left:0;
+        padding-right:0;
+    }	
+    td { 
+        position: relative;
+        text-align:center;
+        
+    }
+    td#nadpis{
+        color:#fff;
+        background-color:#303030;
+        
+    }
+    a.btn {
+    	width:150px;
+    }
+}

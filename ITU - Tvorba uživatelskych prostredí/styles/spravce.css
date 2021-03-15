@@ -1,0 +1,92 @@
+#footer {
+    background: #303030;
+    margin: 0;
+}
+#footer p {
+    padding: 2vh 0;
+    margin: 0;
+}
+
+.back {
+    border-bottom: 1px solid #0b092d;
+    margin-top: 4vh;
+    background: #fff;
+    text-transform: uppercase;
+    font-family: sans-serif;
+    color: #0b092d;
+    font-size: 18px;
+    font-weight: 100;
+    padding: 20px;
+    min-height: 22px;
+ }
+ .back:hover {
+     background-color: #F95F3F;
+     color: white;
+ }
+ 
+ a {
+     text-decoration: none;
+ }
+ 
+ #form_person, #form_name {
+     margin-right: 4vh;
+ }
+
+ 
+ .button {
+    border: none;
+    background-color: #F95F3F;
+    color: white;
+    text-align: center;
+    margin: 2vh 0;
+    width: 15vh;
+    height: 2.5vh;
+    min-height: 22px;
+ }
+ 
+ .button:hover {
+     background-color: #0b092d;
+ }
+ #main_content {
+     font-size: 3vh;
+    color: darkred;
+ }
+ #main_content div, table {
+     margin: auto;
+     margin-bottom: 4vh;
+     padding-top: 2vh;
+ }
+
+#main_content div:last-child {
+    margin-bottom: 0;
+}
+table{
+    width:50%;
+    margin:auto;
+    color:#fff;
+    padding-top:4vh;
+    border-spacing:1; 
+    padding-bottom:10vh;
+
+}
+th {
+    background-color:#303030;
+    font-weight:400;
+    font-size:16px;
+  
+}
+td{
+    background-color:#000;
+    font-size:15px;
+}
+
+caption{
+    color:#303030;
+    padding-top:2vh;
+    padding-bottom:2vh;
+    font-size:18px;
+    font-weight:500;
+}
+input {
+    text-align: center;
+}

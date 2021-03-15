@@ -1,0 +1,97 @@
+*{font-size:15px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;line-height: 1.5;margin:0;padding:0;}
+body{ text-align: center;background-color:#f1f1f1}
+input#loginid {border:1px solid #f95f3f; width:40vw;height:30px;margin-left:30px;margin-bottom:3vh;margin:auto; text-align:center;}
+input#submit{background-color:#f95f3f; color:#fff;border:0px;border:1 px solid #fff;font-size:16px; border-radius:3%; width:100px;height:30px;margin-left:30px;margin:auto; text-align:center;}
+input#submit:hover{background-color:#0b092d; color:#fff;border:0px;border:1 px solid #fff; }
+img{max-width:450px;width:80%;  margin-left: auto;margin-right: auto;display: block;}
+form{margin-left:auto;margin-right:auto;text-align: center;}
+.logo{width:100vw;margin-left:auto;margin-right:auto;background-color:#303030;padding-top:5vh;  padding-bottom:7vh;}
+p {margin-top:5vh;padding-bottom:8vh;color:#fff;font-size:18px;}
+.form{width: 75vw;height:35vh;background: #FFFFFF;margin: 50px auto;;background-color:#303030;}
+h2{background: #fff;text-transform: uppercase;font-family:sans-serif;color: #0b092d;font-size: 18px;font-weight: 100;padding: 20px;margin-bottom:40px;border-bottom: 1px solid #0b092d;} 
+.message{height:10vh;}
+.message h1{text-align: center; padding-top:7vh;font-size:16px;}
+.message p{color:#f95f3f;}
+.stats{
+        padding-top:20vh;
+        width:75%;
+        margin:auto;
+        padding-bottom:80px;
+}
+#new h3 {
+    padding:15px;
+}
+#new h2{
+    width:73%;
+    margin:0 auto;
+}
+.stats h2{
+    width:95%;
+    margin:0 auto;
+}
+.stats h3{
+    padding:15px;
+}
+.stats h3 p{
+    color:#f95f3f;
+}
+@media screen and (max-width: 600px) {
+    img{
+        width:50%;
+    }
+    .form{
+        width:92vw;
+        height:45%;
+        min-height:180px;
+    }
+    input#loginid{
+        width:60vw;
+    }
+    body{background-color:#f1f1f1}
+    .logo{
+        height:15vh;
+    }
+    form{
+        height:50%;
+        min-height:180px;
+    }
+    p{
+
+        text-align:center;
+        width:85%;
+        padding-top:2vh;
+        margin:0 auto;
+        font-size:16px;
+        padding-top:40px;
+    }
+     .stats h2{
+        width:100%;
+        padding:0;
+        padding-bottom:2vh;
+        padding-top:2vh;
+        margin:auto;       
+    }
+   .stats{
+    position:relative;
+    width:100%;
+    margin:0 auto;
+    padding:0;
+    height:550px;
+       
+    }
+
+    #new{
+    height:400px;
+    width:100%;
+    padding-top:10px;
+    display:none;
+    }
+
+    #new h2{
+    width:100%;
+    padding:0;
+    padding-bottom:2vh;
+    padding-top:2vh;
+    margin:auto;       
+    }
+}

@@ -1,0 +1,130 @@
+ * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        box-sizing: border-box;
+        color: #fff;
+        text-align: center;
+    }
+    
+    body {
+        position: fixed;
+        height: 100vh;
+        width: 100vw;
+        top: 0px;
+        left: 0px;
+        background-image: url(/img/bg.png);
+        background-repeat: repeat-x;
+        background-attachment: fixed;
+        background-position: center;
+    }
+    
+    body .content {
+        height: 85vh;
+        padding-bottom: 50px;
+        width: 500px;
+        margin: 0 auto;
+        background-color: #303030;
+    }
+    
+    body .content h2 {
+        background: #fff;
+        text-transform: uppercase;
+        color: #0b092d;
+        font-size: 18px;
+        font-weight: 100;
+        margin-top: 10vh;
+        height: 60px;
+        padding-top: 20px;
+        text-align: center;
+    }
+    
+    img {
+        width: 55%;
+        padding-top: 20px;
+        padding-bottom: 10px;
+    }
+    
+    .content .menu {
+        width: 100%;
+        margin-top: 20px;
+        display: flex;
+    }
+    
+    .item {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .item:hover {
+        background-color: #f95f3f;
+        color: #0c0a2e;
+    }
+    
+    .item .favic {
+        padding-top: 50px;
+    }
+    
+    i {
+        font-size: 32px;
+    }
+    
+    .menu .item a {
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+    
+    p {
+        padding-top: 60px;
+    }
+    
+    @media screen and (max-width: 600px) {
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            box-sizing: border-box;
+            color: #fff;
+            text-align: center;
+        }
+        .content {
+            height: 100vh;
+            width: 100vw;
+        }
+        .logo {
+            padding-top: 5vh;
+            height: 20vh;
+            padding-bottom: 5vh;
+        }
+        .menu {
+            height: 40vh;
+        }
+        body .content h2 {
+            background: #f95f3f;
+            color: #fff;
+            font-weight: 100;
+            margin: 0;
+            height: 10vh;
+            padding-top: 4vh;
+        }
+        body {
+            background: none;
+        }
+        body .content {
+            height: 100vh;
+            width: 100vw;
+            margin: 0 auto;
+            background-color: #303030;
+        }
+        .copyright {
+            height: 3vh;
+            color: #f95f3f;
+            text-transform: uppercase;
+            padding-top: 3vh;
+            padding-bottom: 3vh;
+        }
+        p {
+            height: 3vh;
+            padding-bottom: 1vh;
+        }
+    }
