@@ -1007,7 +1007,6 @@ void GPU::perspectiveDivision()
 {
 	for(size_t i = 0 ; i < AfterClipping.size();i++)
 	{
-	//   printf("\n BEFORE PERSP Ax:%f Ay:%f Aw:%f\n Bx: %f By: %f bw:%f\n Cx: %f Cy:%f cw:%f\n",AfterClipping[i].A.gl_Position.x,AfterClipping[i].A.gl_Position.y,AfterClipping[i].A.gl_Position.w,AfterClipping[i].B.gl_Position.x,AfterClipping[i].B.gl_Position.y,AfterClipping[i].B.gl_Position.w,AfterClipping[i].C.gl_Position.x,AfterClipping[i].C.gl_Position.y,AfterClipping[i].C.gl_Position.w);
 		AfterClipping[i].A.gl_Position.x = AfterClipping[i].A.gl_Position.x / AfterClipping[i].A.gl_Position.w;
 		AfterClipping[i].A.gl_Position.y = AfterClipping[i].A.gl_Position.y / AfterClipping[i].A.gl_Position.w;
 		AfterClipping[i].A.gl_Position.z = AfterClipping[i].A.gl_Position.z / AfterClipping[i].A.gl_Position.w;
@@ -1031,7 +1030,6 @@ void GPU:: viewportTransformation()
 	//inspiration from http://web.cse.ohio-state.edu/~shen.94/5542/Site/Slides_files/coordinates5542.pdf
 	for(size_t i = 0;i < AfterClipping.size();i++)
 	{
-	// printf("\n Ax:%f Ay:%f\n Bx: %f By: %f\n Cx: %f Cy:%f\n",AfterClipping[i].A.gl_Position.x,AfterClipping[i].A.gl_Position.y,AfterClipping[i].B.gl_Position.x,AfterClipping[i].B.gl_Position.y,AfterClipping[i].C.gl_Position.x,AfterClipping[i].C.gl_Position.y);
 		AfterClipping[i].A.gl_Position.x = ((AfterClipping[i].A.gl_Position.x -(-1)) / 2.0) * FrameBufferWidth;
 		AfterClipping[i].B.gl_Position.x = ((AfterClipping[i].B.gl_Position.x -(-1)) / 2.0) * FrameBufferWidth;
 		AfterClipping[i].C.gl_Position.x = ((AfterClipping[i].C.gl_Position.x -(-1)) / 2.0) * FrameBufferWidth;
@@ -1056,7 +1054,6 @@ void GPU:: viewportTransformation()
 		MaxY.push_back(sortheight[2]);
 		sortheight.clear();
 
-		//printf("\n Ax:%f Ay:%f\n Bx: %f By: %f\n Cx: %f Cy:%f\n",AfterClipping[i].A.gl_Position.x,AfterClipping[i].A.gl_Position.y,AfterClipping[i].B.gl_Position.x,AfterClipping[i].B.gl_Position.y,AfterClipping[i].C.gl_Position.x,AfterClipping[i].C.gl_Position.y);
 	}
 	rasterization();
 }
