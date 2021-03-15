@@ -2,7 +2,6 @@
  * @file
  * @brief This file contains implementation of gpu
  *
- * @author Tomáš Milet, imilet@fit.vutbr.cz
  */
 #include <student/gpu.hpp>
 
@@ -151,10 +150,6 @@ ObjectID GPU::createVertexPuller()
 	initTable.VertexID = VertexPullCounter;
 	VertexPull.push_back(initTable);
 	return VertexPullCounter;
-
-  /// \todo Tato funkce vytvoří novou práznou tabulku s nastavením pro vertex puller.<br>
-  /// Funkce by měla vrátit identifikátor nové tabulky.
-  /// Prázdná tabulka s nastavením neobsahuje indexování a všechny čtecí hlavy jsou vypnuté.
 }
 
 /**
@@ -171,10 +166,6 @@ void GPU::deleteVertexPuller(VertexPullerID vao)
 			VertexPull.erase(VertexPull.begin() + i);
 		}
 	}
-
-  /// \todo Tato funkce by měla odstranit tabulku s nastavení pro vertex puller.<br>
-  /// Parameter "vao" obsahuje identifikátor tabulky s nastavením.<br>
-  /// Po uvolnění nastavení je identifiktátor volný a může být znovu použit.<br>
 }
 
 /**
@@ -201,13 +192,6 @@ void GPU::setVertexPullerHead(VertexPullerID vao, uint32_t head, AttributeType t
 			return;
 		}
 	}
-  /// \todo Tato funkce nastaví jednu čtecí hlavu vertex pulleru.<br>
-  /// Parametr "vao" vybírá tabulku s nastavením.<br>
-  /// Parametr "head" vybírá čtecí hlavu vybraného vertex pulleru.<br>
-  /// Parametr "type" nastaví typ atributu, který čtecí hlava čte. Tímto se vybere kolik dat v bajtech se přečte.<br>
-  /// Parametr "stride" nastaví krok čtecí hlavy.<br>
-  /// Parametr "offset" nastaví počáteční pozici čtecí hlavy.<br>
-  /// Parametr "buffer" vybere buffer, ze kterého bude čtecí hlava číst.<br>
 }
 
 /**
@@ -228,10 +212,6 @@ void GPU::setVertexPullerIndexing(VertexPullerID vao, IndexType type, BufferID b
 			return;
 		}
 	}
-  /// \todo Tato funkce nastaví indexování vertex pulleru.
-  /// Parametr "vao" vybírá tabulku s nastavením.<br>
-  /// Parametr "type" volí typ indexu, který je uložený v bufferu.<br>
-  /// Parametr "buffer" volí buffer, ve kterém jsou uloženy indexy.<br>
 }
 
 /**
@@ -268,9 +248,6 @@ void GPU::disableVertexPullerHead(VertexPullerID vao, uint32_t head)
 			return;
 		}
 	}
-  /// \todo Tato funkce zakáže čtecí hlavu daného vertex pulleru.<br>
-  /// Pokud je čtecí hlava zakázána, hodnoty z bufferu se nebudou kopírovat do atributu vrcholu.<br>
-  /// Parametry "vao" a "head" vybírají vertex puller a čtecí hlavu.<br>
 }
 
 /**
@@ -283,8 +260,6 @@ void GPU::bindVertexPuller(VertexPullerID vao)
 	activeVertexPuller = &VertexPull[vao];
 	ActiveVertexPuller = vao;
 	return;
-  /// \todo Tato funkce aktivuje nastavení vertex pulleru.<br>
-  /// Pokud je daný vertex puller aktivován, atributy z bufferů jsou vybírány na základě jeho nastavení.<br>
 }
 
 /**
@@ -295,8 +270,6 @@ void GPU::unbindVertexPuller()
 	activeVertexPuller = nullptr;
 	ActiveVertexPuller = emptyID;
 	return;
-  /// \todo Tato funkce deaktivuje vertex puller.
-  /// To většinou znamená, že se vybere neexistující "emptyID" vertex puller.
 }
 
 /**
@@ -336,11 +309,6 @@ ProgramID GPU::createProgram()
 	initPrograms.ProgramID = ProgramsCounter;
 	Programs.push_back(initPrograms);
 	return ProgramsCounter;
-
-  /// \todo Tato funkce by měla vytvořit nový shader program.<br>
-  /// Funkce vrací unikátní identifikátor nového proramu.<br>
-  /// Program je seznam nastavení, které obsahuje: ukazatel na vertex a fragment shader.<br>
-  /// Dále obsahuje uniformní proměnné a typ výstupních vertex attributů z vertex shaderu, které jsou použity pro interpolaci do fragment atributů.<br>
 }
 
 /**
@@ -369,7 +337,6 @@ void GPU::deleteProgram(ProgramID prg)
  */
 void GPU::attachShaders(ProgramID prg, VertexShader vs, FragmentShader fs)
 {
-  /// \todo Tato funkce by měla připojít k vybranému shader programu vertex a fragment shader.
 	for (size_t i = 0; i < Programs.size(); i++)
 	{
 		if (Programs[i].ProgramID == prg)
@@ -393,12 +360,6 @@ void GPU::setVS2FSType(ProgramID prg, uint32_t attrib, AttributeType type)
 	Programs[prg - 1].vs2fs[attrib] = type;
 	Programs[prg - 1].vs2fs_set = true;
 	return;
-  /// \todo tato funkce by měla zvolit typ vertex atributu, který je posílán z vertex shaderu do fragment shaderu.<br>
-  /// V průběhu rasterizace vznikají fragment.<br>
-  /// Fragment obsahují fragment atributy.<br>
-  /// Tyto atributy obsahují interpolované hodnoty vertex atributů.<br>
-  /// Tato funkce vybere jakého typu jsou tyto interpolované atributy.<br>
-  /// Bez jakéhokoliv nastavení jsou atributy prázdne AttributeType::EMPTY<br>
 }
 
 /**
@@ -411,7 +372,6 @@ void GPU::useProgram(ProgramID prg)
 	activeProgram = &Programs[prg];
 	ActiveProgram = prg;
 	return;
-  /// \todo tato funkce by měla vybrat aktivní shader program.
 }
 
 /**
@@ -431,8 +391,6 @@ bool GPU::isProgram(ProgramID prg)
 		}
 	}
 	return false;
-  /// \todo tato funkce by měla zjistit, zda daný program existuje.<br>
-  /// Funkce vráti true, pokud program existuje.<br>
 }
 
 /**
@@ -446,11 +404,6 @@ void GPU::programUniform1f(ProgramID prg, uint32_t uniformId, float const &d)
 {
 	Programs[prg - 1].uniforms.uniform[uniformId].v1 = d;
 	return;
-
-  /// \todo tato funkce by měla nastavit uniformní proměnnou shader programu.<br>
-  /// Parametr "prg" vybírá shader program.<br>
-  /// Parametr "uniformId" vybírá uniformní proměnnou. Maximální počet uniformních proměnných je uložen v programné \link maxUniforms \endlink.<br>
-  /// Parametr "d" obsahuje data (1 float).<br>
 }
 
 /**
@@ -464,8 +417,6 @@ void GPU::programUniform2f(ProgramID prg, uint32_t uniformId, glm::vec2 const &d
 {
 	Programs[prg - 1].uniforms.uniform[uniformId].v2 = glm::vec2(d);
 	return;
-  /// \todo tato funkce dělá obdobnou věc jako funkce programUniform1f.<br>
-  /// Místo 1 floatu nahrává 2 floaty.
 }
 
 /**
@@ -479,8 +430,6 @@ void GPU::programUniform3f(ProgramID prg, uint32_t uniformId, glm::vec3 const &d
 {
 	Programs[prg - 1].uniforms.uniform[uniformId].v3 = glm::vec3(d);
 	return;
-  /// \todo tato funkce dělá obdobnou věc jako funkce programUniform1f.<br>
-  /// Místo 1 floatu nahrává 3 floaty.
 }
 
 /**
@@ -494,8 +443,6 @@ void GPU::programUniform4f(ProgramID prg, uint32_t uniformId, glm::vec4 const &d
 {
 	Programs[prg - 1].uniforms.uniform[uniformId].v4 = glm::vec4(d);
 	return;
-  /// \todo tato funkce dělá obdobnou věc jako funkce programUniform1f.<br>
-  /// Místo 1 floatu nahrává 4 floaty.
 }
 
 /**
@@ -509,8 +456,6 @@ void GPU::programUniformMatrix4f(ProgramID prg, uint32_t uniformId, glm::mat4 co
 {
 	Programs[prg - 1].uniforms.uniform[uniformId].m4 = d;
 	return;
-  /// \todo tato funkce dělá obdobnou věc jako funkce programUniform1f.<br>
-  /// Místo 1 floatu nahrává matici 4x4 (16 floatů).
 }
 
 /// @}
@@ -527,12 +472,6 @@ void GPU::programUniformMatrix4f(ProgramID prg, uint32_t uniformId, glm::mat4 co
  */
 void GPU::createFramebuffer(uint32_t width, uint32_t height)
 {
-  /// \todo Tato funkce by měla alokovat framebuffer od daném rozlišení.<br>
-  /// Framebuffer se skládá z barevného a hloukového bufferu.<br>
-  /// Buffery obsahují width x height pixelů.<br>
-  /// Barevný pixel je složen z 4 x uint8_t hodnot - to reprezentuje RGBA barvu.<br>
-  /// Hloubkový pixel obsahuje 1 x float - to reprezentuje hloubku.<br>
-  /// Nultý pixel framebufferu je vlevo dole.<br>
 	FrameBufferWidth = width;
 	FrameBufferHeight = height;
 	uint64_t size = width * height;
@@ -547,7 +486,6 @@ void GPU::createFramebuffer(uint32_t width, uint32_t height)
  */
 void GPU::deleteFramebuffer()
 {
-  /// \todo tato funkce by měla dealokovat framebuffer.
 	ColorBuff.clear();
 	DepthBuff.clear();
 	FrameBufferWidth = 0;
@@ -563,7 +501,6 @@ void GPU::deleteFramebuffer()
  */
 void GPU::resizeFramebuffer(uint32_t width, uint32_t height)
 {
-  /// \todo Tato funkce by měla změnit velikost framebuffer
 	FrameBufferWidth = width;
 	FrameBufferHeight = height;
 	uint64_t size = width * height;
@@ -580,7 +517,6 @@ void GPU::resizeFramebuffer(uint32_t width, uint32_t height)
  */
 uint8_t *GPU::getFramebufferColor()
 {
-  /// \todo Tato funkce by měla vrátit ukazatel na začátek barevného bufferu.<br>
 	return &ColorBuff[0];
 }
 
@@ -591,7 +527,6 @@ uint8_t *GPU::getFramebufferColor()
  */
 float *GPU::getFramebufferDepth()
 {
-  /// \todo tato funkce by mla vrátit ukazatel na začátek hloubkového bufferu.<br>
 	return &DepthBuff[0];
 }
 
@@ -602,7 +537,6 @@ float *GPU::getFramebufferDepth()
  */
 uint32_t GPU::getFramebufferWidth()
 {
-  /// \todo Tato funkce by měla vrátit šířku framebufferu.
 	return FrameBufferWidth;
 }
 
@@ -613,7 +547,6 @@ uint32_t GPU::getFramebufferWidth()
  */
 uint32_t GPU::getFramebufferHeight()
 {
-  /// \todo Tato funkce by měla vrátit výšku framebufferu.
 	return FrameBufferHeight;
 }
 
@@ -650,37 +583,27 @@ void GPU::clear(float r, float g, float b, float a)
 			DepthBuff[(i * FrameBufferWidth + j)] = 1024.f;
 		}
 	}
-  /// \todo Tato funkce by měla vyčistit framebuffer.<br>
-  /// Barevný buffer vyčistí na barvu podle parametrů r g b a (0 - nulová intenzita, 1 a větší - maximální intenzita).<br>
-  /// (0,0,0) - černá barva, (1,1,1) - bílá barva.<br>
-  /// Hloubkový buffer nastaví na takovou hodnotu, která umožní rasterizaci trojúhelníka, který leží v rámci pohledového tělesa.<br>
-  /// Hloubka by měla být tedy větší než maximální hloubka v NDC (normalized device coordinates).<br>
 }
 
 void GPU::drawTriangles(uint32_t nofVertices)
 {
-  /// \todo Tato funkce vykreslí trojúhelníky podle daného nastavení.<br>
-  /// Vrcholy se budou vybírat podle nastavení z aktivního vertex pulleru (pomocí bindVertexPuller).<br>
-  /// Vertex shader a fragment shader se zvolí podle aktivního shader programu (pomocí useProgram).<br>
-  /// Parametr "nofVertices" obsahuje počet vrcholů, který by se měl vykreslit (3 pro jeden trojúhelník).<br>
 	if((nofVertices % 3) != 0)
-	{
-	return;
-	}
+		return;
+
 	if(VertexPull[ActiveVertexPuller - 1].Indexing == IndexType::UINT8)
 	{
-	indexDraw<uint8_t>();
-	return;
+		indexDraw<uint8_t>();
+		return;
 	}
 	else if(VertexPull[ActiveVertexPuller - 1].Indexing == IndexType::UINT16)
 	{
-	indexDraw<uint16_t>();
-	return;
+		indexDraw<uint16_t>();
+		return;
 	}
 	else if(VertexPull[ActiveVertexPuller - 1].Indexing == IndexType::UINT32)
 	{
-	indexDraw<uint32_t>();
-	return;
+		indexDraw<uint32_t>();
+		return;
 	}
 	auto &actProgram = Programs[ActiveProgram - 1];
 	auto pullerCounter = 0;
@@ -717,9 +640,8 @@ void GPU::drawTriangles(uint32_t nofVertices)
 	}
 	pullerCounter = 0;
 	for(size_t i = 0; i < outvertex.size();i++)
-	{
 		setPrimitives.push_back(outvertex[i]);
-	}
+
 	outvertex.clear();
 	assemblePrimitives();
 }
@@ -728,9 +650,8 @@ void GPU::assemblePrimitives()
 {
 	size_t PrimitivesCount = setPrimitives.size();
 	if(PrimitivesCount % 3 != 0)
-	{
 		return;
-	}
+	
 	size_t TriangleToSet = PrimitivesCount / 3;
 	auto a = 0;
 	auto b = 1;
@@ -885,7 +806,7 @@ void GPU::clipping()
 				AfterClipping.push_back(after1); // A(t) B C
 				AfterClipping.push_back(after2); // A(t) C A(t)2
 			}
-			}
+		}
 		// dva outvertexy nesplnuju podmienku
 		else if(((a.z < -a.w) && (b.z < -b.w) && (c.z >= -c.w)) || ((a.z < -a.w) && (b.z >= -b.w) && (c.z < -c.w)) || ((a.z >= -a.w) && (b.z < -b.w) && (c.z < -c.w)) )
 		{
@@ -1007,7 +928,6 @@ void GPU::perspectiveDivision()
 {
 	for(size_t i = 0 ; i < AfterClipping.size();i++)
 	{
-	//   printf("\n BEFORE PERSP Ax:%f Ay:%f Aw:%f\n Bx: %f By: %f bw:%f\n Cx: %f Cy:%f cw:%f\n",AfterClipping[i].A.gl_Position.x,AfterClipping[i].A.gl_Position.y,AfterClipping[i].A.gl_Position.w,AfterClipping[i].B.gl_Position.x,AfterClipping[i].B.gl_Position.y,AfterClipping[i].B.gl_Position.w,AfterClipping[i].C.gl_Position.x,AfterClipping[i].C.gl_Position.y,AfterClipping[i].C.gl_Position.w);
 		AfterClipping[i].A.gl_Position.x = AfterClipping[i].A.gl_Position.x / AfterClipping[i].A.gl_Position.w;
 		AfterClipping[i].A.gl_Position.y = AfterClipping[i].A.gl_Position.y / AfterClipping[i].A.gl_Position.w;
 		AfterClipping[i].A.gl_Position.z = AfterClipping[i].A.gl_Position.z / AfterClipping[i].A.gl_Position.w;
@@ -1031,7 +951,6 @@ void GPU:: viewportTransformation()
 	//inspiration from http://web.cse.ohio-state.edu/~shen.94/5542/Site/Slides_files/coordinates5542.pdf
 	for(size_t i = 0;i < AfterClipping.size();i++)
 	{
-	// printf("\n Ax:%f Ay:%f\n Bx: %f By: %f\n Cx: %f Cy:%f\n",AfterClipping[i].A.gl_Position.x,AfterClipping[i].A.gl_Position.y,AfterClipping[i].B.gl_Position.x,AfterClipping[i].B.gl_Position.y,AfterClipping[i].C.gl_Position.x,AfterClipping[i].C.gl_Position.y);
 		AfterClipping[i].A.gl_Position.x = ((AfterClipping[i].A.gl_Position.x -(-1)) / 2.0) * FrameBufferWidth;
 		AfterClipping[i].B.gl_Position.x = ((AfterClipping[i].B.gl_Position.x -(-1)) / 2.0) * FrameBufferWidth;
 		AfterClipping[i].C.gl_Position.x = ((AfterClipping[i].C.gl_Position.x -(-1)) / 2.0) * FrameBufferWidth;
@@ -1056,7 +975,6 @@ void GPU:: viewportTransformation()
 		MaxY.push_back(sortheight[2]);
 		sortheight.clear();
 
-		//printf("\n Ax:%f Ay:%f\n Bx: %f By: %f\n Cx: %f Cy:%f\n",AfterClipping[i].A.gl_Position.x,AfterClipping[i].A.gl_Position.y,AfterClipping[i].B.gl_Position.x,AfterClipping[i].B.gl_Position.y,AfterClipping[i].C.gl_Position.x,AfterClipping[i].C.gl_Position.y);
 	}
 	rasterization();
 }
@@ -1065,10 +983,7 @@ void GPU:: viewportTransformation()
 // interpolation insp from https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 void GPU::rasterization()
 {
-  
-  
 	auto &program = Programs[ActiveProgram - 1];
-
 	for(size_t i = 0; i < AfterClipping.size();i++)
 	{
 		for(uint32_t y =(uint32_t) MinY[i]; y < MaxY[i];y++)
@@ -1177,4 +1092,3 @@ bool GPU::depthTest(float newDepth,float oldDepth)
 		return false;
 	}
 }
-
