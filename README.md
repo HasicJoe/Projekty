@@ -1,1 +1,2 @@
-# Projekty FIT VUT - @Samuel Valaštín
+## Projekty FIT VUT - @Samuel Valaštín
+## 2019-2021
