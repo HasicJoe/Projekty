@@ -15,8 +15,6 @@ import sys
 from matplotlib import pyplot as plt
 
 
-
-
 def parse_people(df,names,months,years,writer):
     list_of_emp = []
     for empl in names:
@@ -38,9 +36,7 @@ def parse_people(df,names,months,years,writer):
     hmotnost_zvez_zas = 0.0
     pocet_dor_stop = 0
     pocet_zvez_stop = 0
-
     last_dance = []
-
     for this_emp_this_mon in mega_set_mix:
         #print("-----------------------------\n",this_emp_this_mon,"\n------------------------------\n")
         for i in this_emp_this_mon.index:
@@ -73,19 +69,16 @@ def parse_people(df,names,months,years,writer):
         pocet_zvez_stop = 0
     
     by_month_emp_df = pandas.DataFrame(last_dance,columns = ["Meno vodiča","Mesiac výkonu","Počet stopov rozvoz", "Počet stopov zvoz","Hmotnosť obj. rozvoz","Hmotnosť obj. zvoz","Počet doručených stopov","Počet zvezených stopov", "Σ (Rozvoz + zvoz)","% úsp. rozvoz","% úst. zvoz"])
-    write_emp(by_month_emp_df,writer)      
-
+    write_emp(by_month_emp_df,writer)
 
 
 def parse_depo(df,days,months,years):
-
     day_data = {"Deň","Počet rozvozov","Hmotnosť rozvoz","Počet zvozov","Hmotnosť zvoz", "Σ(Rozvoz + zvoz)"}
     hmotnost_rozvozu = 0.0
     hmotnost_zvozu = 0.0
     pocet_zvozov = 0
     pocet_rozvozov = 0
     day_list = []
-    month_list = []
 
     for this_day in days:
         for i in df.index:
@@ -95,7 +88,6 @@ def parse_depo(df,days,months,years):
                 pocet_zvozov += df["počet zvezených stopov"][i]
                 pocet_rozvozov += df["počet doručených stopov"][i]
         my_sum = pocet_zvozov + pocet_rozvozov
-        #any_row = [this_day,hmotnost_rozvozu,hmotnost_zvozu,pocet_zvozov,pocet_rozvozov]
         any_row = [this_day,pocet_rozvozov, hmotnost_rozvozu,pocet_zvozov,hmotnost_zvozu,my_sum]
         day_list.append(any_row)
         hmotnost_rozvozu = 0.0
@@ -106,14 +98,12 @@ def parse_depo(df,days,months,years):
     depo_frame_day = pandas.DataFrame(day_list,columns = ["Deň","Počet rozvozov","Hmotnosť rozvoz","Počet zvozov","Hmotnosť zvoz", "Σ (Rozvoz + zvoz)"])
     bar["value"] = 30
     new_frame = df.copy()
-
-    month_list = new_frame.values.tolist()
     list_of_kgs_rozvoz = []
     list_of_kgs_zvoz = []
     list_of_kgs_mnths = []
     list_of_months = []
     last_list_mon = []
-    ## TODO
+
     for this_month in months:
         month_split = df[df["Dátum výkonu"].str.match(this_month)==True]
         list_of_months.append(month_split)
@@ -133,18 +123,15 @@ def parse_depo(df,days,months,years):
         list_of_kgs_zvoz.append(hmotnost_zvozu)
         list_of_kgs_mnths.append(mont_fix)
         any_row = [mont_fix,pocet_rozvozov,round(hmotnost_rozvozu,2),pocet_zvozov,round(hmotnost_zvozu,2),my_sum]
-        #any_row = [mont_fix,round(hmotnost_rozvozu,2),round(hmotnost_zvozu,2),pocet_zvozov,pocet_rozvozov]
         hmotnost_rozvozu = 0.0
         hmotnost_zvozu = 0.0
         pocet_zvozov = 0
         pocet_rozvozov = 0
         last_list_mon.append(any_row)
 
-        
     depo_frame_month = pandas.DataFrame(last_list_mon,columns = ["Mesiac","Počet rozvozov","Hmotnosť rozvoz","Počet zvozov","Hmotnosť zvoz", "Σ (Rozvoz + zvoz)"])
     # now dataframes are stored in depo_frame_month and depo_frame_day
     bar["value"] = 40
-
     writer = write_depo(depo_frame_day,depo_frame_month,list_of_kgs_rozvoz,list_of_kgs_zvoz,list_of_kgs_mnths)
     return writer
 
@@ -162,7 +149,7 @@ def multiple_dfs(df_list, sh_name, file_name, spaces,col_len,l_rozvoz,l_zvoz,l_m
         if row == 0:
             worksheet = writer.sheets[sh_name]
             worksheet.autofilter(row,0,row,col_len)
-            #worksheet.merge_range(row, 0,row,col_len,["Mesiac","Počet rozvozov","Hmotnosť rozvoz","Počet zvozov","Hmotnosť zvoz", "Σ (Rozvoz + zvoz)"],header_fmt)   
+
         row = row + len(dataframe.index) + spaces + 1
 
     
@@ -227,7 +214,7 @@ def multiple_dfs(df_list, sh_name, file_name, spaces,col_len,l_rozvoz,l_zvoz,l_m
     chart2.set_x_axis({"name":"mesiac",'num_font':  {'rotation': -90}})
     chart2.set_y2_axis({"name":"hm. zvozy"})
     chart2.set_y_axis({"name":"hm. rozvozy"})
-    #chart1.set_plotarea({'fill':   {'color': '#303030'}})
+
     chart1.set_legend({'position': 'top'})
     chart2.set_legend({'position': 'top'})
     worksheet.insert_chart("H"+str(header_day),chart1,{'x_offset': 20, 'y_offset': 10,'x_scale': 1.4, 'y_scale': 1.2})
@@ -280,7 +267,6 @@ def write_emp(emp,writer):
     })
     chart1.add_series({
     "name" : "zvoz",
-    #'categories': '=Depo!$AS$2:$A$'+leng,
     'values':     '=Zamestnanci!$D$2:$D$'+row_len,
     'data_labels': {'value': True},
     'fill':   {'color': '#c3073f'}
@@ -289,7 +275,6 @@ def write_emp(emp,writer):
     chart1.set_legend({'position': 'top'})
     worksheet.insert_chart("A"+str(graph_pos),chart1,{'x_offset': 15, 'y_offset': 10,'x_scale': 2.4, 'y_scale': 1.5})
     writer.save()
-
 
 
 def parse_file(filename):
@@ -338,7 +323,6 @@ def parse_file(filename):
     sys.exit(0)
 
 
-    
 def open_excel_file():
     filetypes = (('Excel súbory', '*.xlsx'),('Všetky súbory', '*.*'))
     f = fd.askopenfile(filetypes=filetypes)
