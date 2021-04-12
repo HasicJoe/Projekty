@@ -1,4 +1,8 @@
-""" IPK 2020/2021 - Projekt 1 - Samuel Valastin <xvalas10@stud.fit.vutbr.cz> """
+""" 
+IPK 2020/2021 
+Projekt 1 - Klient pre súborový systém 
+Samuel Valastin <xvalas10@stud.fit.vutbr.cz> 
+"""
 import sys
 import re
 import socket
