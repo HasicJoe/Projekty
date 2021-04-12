@@ -1,5 +1,5 @@
 -- fsm.vhd: Finite State Machine
--- Author(s): 
+-- Author(s): Samuel ValaÅ¡tÃ­n <xvalas10@stud.fit.vutbr.cz>
 --
 library ieee;
 use ieee.std_logic_1164.all;
@@ -94,7 +94,7 @@ begin
 	      next_state <= STT_ERROR;
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
-	-- kód 1 pokraèovanie 12576
+	-- kï¿½d 1 pokraï¿½ovanie 12576
 	when STT_5_1 =>
       next_state <= STT_5_1;
       if (KEY(6) = '1') then
@@ -105,7 +105,7 @@ begin
 	      next_state <= STT_ERROR;
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
-	-- kód 2 pokraèovanie 12557
+	-- kï¿½d 2 pokraï¿½ovanie 12557
 	when STT_5_2 =>
       next_state <= STT_5_2;
       if (KEY(7) = '1') then
@@ -116,7 +116,7 @@ begin
 	      next_state <= STT_ERROR;
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
-	-- kód1 125767 
+	-- kï¿½d1 125767 
 	when STT_6_1 =>
       next_state <= STT_6_1;
       if (KEY(7) = '1') then
@@ -127,7 +127,7 @@ begin
 	      next_state <= STT_ERROR;
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
-	--kód2 125573
+	--kï¿½d2 125573
 	when STT_6_2 =>
       next_state <= STT_6_2;
       if (KEY(3) = '1') then
@@ -138,7 +138,7 @@ begin
 	      next_state <= STT_ERROR;
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
-	-- kód1 1257672 
+	-- kï¿½d1 1257672 
 	when STT_7_1 =>
       next_state <= STT_7_1;
       if (KEY(2) = '1') then
@@ -149,7 +149,7 @@ begin
 	      next_state <= STT_ERROR;
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
-	--kód2 1255732
+	--kï¿½d2 1255732
 	when STT_7_2 =>
       next_state <= STT_7_2;
       if (KEY(2) = '1') then
@@ -161,7 +161,7 @@ begin
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
 	  -- - - - - - - - - - - - - - - - - - - - - - -
-	-- kód1 12576725 
+	-- kï¿½d1 12576725 
 	when STT_8_1 =>
       next_state <= STT_8_1;
       if (KEY(5) = '1') then
@@ -172,7 +172,7 @@ begin
 	      next_state <= STT_ERROR;
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
-	--kód2 12557329
+	--kï¿½d2 12557329
 	when STT_8_2 =>
       next_state <= STT_8_2;
       if (KEY(9) = '1') then
@@ -236,21 +236,21 @@ begin
 	      next_state <= STT_ERROR;
       end if;
   -- - - - - - - - - - - - - - - - - - - - - - -	
-  -- chybový stav 
+  -- chybovï¿½ stav 
   when STT_ERROR =>
       next_state <= STT_ERROR;
       if (KEY(15) = '1') then
          next_state <= STT_PRINT_ERR;
       end if;
   -- - - - - - - - - - - - - - - - - - - - - - -
-  -- spracovanie chyboveho stavu aktivácia vstupneho signálu cnt_of
+  -- spracovanie chyboveho stavu aktivï¿½cia vstupneho signï¿½lu cnt_of
 	when STT_PRINT_ERR =>
 		next_state <= STT_PRINT_ERR;
 		if (CNT_OF = '1') then
 			next_state <= FINISH;
 		end if;
  -- - - - - - - - - - - - - - - - - - - - - - -		
- -- spracovanie validneho vstupu aktivácia vstupneho signálu cnt_of
+ -- spracovanie validneho vstupu aktivï¿½cia vstupneho signï¿½lu cnt_of
 	when STT_PRINT_OK =>
 		next_state <= STT_PRINT_OK;
 		if (CNT_OF = '1') then
@@ -280,19 +280,19 @@ begin
 
    case (present_state) is	 
 	-- - - - - - - - - - - - - - - - - - - - - - -
-	-- vyèisti LCD
+	-- vyï¿½isti LCD
    when FINISH =>
       if (KEY(15) = '1') then
          FSM_LCD_CLR    <= '1';
       end if;
    -- - - - - - - - - - - - - - - - - - - - - - -
-	-- pristup odoprený, FMS_MX_MEM ostavá nastavené na '0' 
+	-- pristup odoprenï¿½, FMS_MX_MEM ostavï¿½ nastavenï¿½ na '0' 
    when STT_PRINT_ERR =>
       FSM_CNT_CE     <= '1';
       FSM_MX_LCD     <= '1';
       FSM_LCD_WR     <= '1';
    -- - - - - - - - - - - - - - - - - - - - - - -
-	-- vypíš povolený, nastavíme FSM_MX_MEM na '1',rovnako všetky ostatné výstupy na '1'
+	-- vypï¿½ povolenï¿½, nastavï¿½me FSM_MX_MEM na '1',rovnako vï¿½etky ostatnï¿½ vï¿½stupy na '1'
 	when STT_PRINT_OK =>
       FSM_CNT_CE     <= '1';
       FSM_MX_LCD     <= '1';
@@ -300,7 +300,7 @@ begin
 		FSM_MX_MEM     <= '1';   
 	-- - - - - - - - - - - - - - - - - - - - - - -
    when others =>
-	--  write * multiplexory sú '0';
+	--  write * multiplexory sï¿½ '0';
 		if (KEY(14 downto 0) /= "000000000000000") then
 			FSM_LCD_WR     <= '1';
 		elsif (KEY(15) = '1') then

@@ -10,6 +10,7 @@ class ERR_STATES:
     invalid_nameserver = 3
     invalid_FSP = 4
     invalid_respond = 5
+    internal_err = 6
 
 
 def parse_arguments(pattern):
@@ -46,6 +47,7 @@ def valid_args(server, service):
 def invalid_answer(server_respond):
     """ Function prints an error response"""
     print("ERROR: " + server_respond)
+    
 
 
 def check_split(split, err_value):
@@ -67,8 +69,11 @@ def udp_request(ip, port, domain_name):
         result = check_udp_respond(respond)
         if decode_data is None:
             invalid_answer("Server didnt respond")
+            invalid_states(ERR_STATES.internal_err)       
     except Exception:
         print(Exception)
+        invalid_states(ERR_STATES.internal_err)
+
     sock.close()
     return result
 
@@ -97,13 +102,20 @@ def download_file(s,message,file_name):
         tcp_out += data
         if not data:
             break
-    header = tcp_out.split(b'\r\n\r\n')     # split by 2 empty lines
+    header = tcp_out.split(b'\r\n\r\n',maxsplit=1)    # split by 2 empty lines
+    exp_len = header[0].split(b":")
+    exp_len = int(exp_len[1].decode("utf-8"))
     recv_data = header[1]                   # data after empty lines
     server_answer = header[0].split(b'\r\n')  
     if re.match("^FSP/1.0 Success$", server_answer[0].decode("utf-8")):
-        save_data(recv_data, file_name)
+        if len(recv_data) == exp_len:  
+            save_data(recv_data, file_name)
+        else:
+            invalid_answer("Couldnt get he whole length of the: " + file_name)
+            save_data(recv_data,file_name)
     else:
         invalid_answer(server_answer[0].decode("utf-8"))
+        invalid_states(ERR_STATES.internal_err)
 
 
 def save_data(data, name):
@@ -205,13 +217,14 @@ def main():
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock_addr = (tcp_ip, tcp_port)
                 sock.connect(sock_addr)
-                start_message = file_service_command + this_file + " " + file_service_version + "\r\n"
-                msg = start_message + hostname + agent
-                download_file(sock, msg, this_file)
             except Exception:
                 print(Exception)
-            finally:
-                sock.close()
+                invalid_states(ERR_STATES.internal_err)
+                
+            start_message = file_service_command + this_file + " " + file_service_version + "\r\n"
+            msg = start_message + hostname + agent
+            download_file(sock, msg, this_file)
+            sock.close()
 
 
 if __name__ == "__main__":
