@@ -1,3 +1,9 @@
+"""
+IPP - Project 2. - Interpret of IPPCODE21
+Author - Samuel Valaštín <xvalas10@stud.fit.vutbr.cz> 
+All possible EXIT CODES for interpret
+"""
+
 class Exit_Codes:
     OK = 0
     INVALID_COMMAND_LINE_ERR = 10

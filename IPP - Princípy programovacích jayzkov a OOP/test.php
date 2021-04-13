@@ -208,7 +208,7 @@ function check_scripts() {
 /**
  * @brief Function searching .in,.out,.src and .rc files and also manage program flow
  */
-# recursive -> https://stackoverflow.com/questions/24783862/list-all-the-files-and-folders-in-a-directory-with-php-recursive-function
+// recursive -> https://stackoverflow.com/questions/24783862/list-all-the-files-and-folders-in-a-directory-with-php-recursive-function
 function make_tests(){
     global $argument_constants;
     check_scripts();
@@ -246,8 +246,18 @@ function make_tests(){
         array_shift($files);
         array_shift($files);
 
-        foreach($files as $file) {
+        // hotfix adding directory to path
+        if(preg_match("/(\/$)/",$argument_constants["directory"])){
+            foreach($files as $file){
+                $files_with_path [] = $argument_constants["directory"] . $file;
+            }
+        } else {
+            foreach($files as $file){
+                $files_with_path [] =  $argument_constants["directory"] . "/". $file;
+            }
+        }
 
+        foreach($files_with_path as $file) {
             if(preg_match($files_regex["SRC_REGEX"],$file)){
                 $src_files[] = $file;
             } else if(preg_match($files_regex["OUT_REGEX"],$file)){
@@ -261,15 +271,12 @@ function make_tests(){
             }
         }
     }
-    // do parse only tests
     if($argument_constants["parse_only"]){
         parse_test($src_files,$out_files,$in_files,$returncode_files);
     }
-    // do interpret only tests
     else if($argument_constants["int_only"]) {
         diff_test($src_files,$out_files,$in_files,$returncode_files);
     }
-    // both parse + interpret tests
     else {
         full_test($src_files,$out_files,$in_files,$returncode_files);
     }
@@ -394,18 +401,17 @@ function diff_test($src_files,$out_files,$in_files,$returncode_files){
         }
         // use exec no shell_exec
         $command_line_string = "python3.8 " . $argument_constants["interpret_script"] . " --source=" . $source_file . " --input=".$find_in_file;
-        $output = "";
+        $output = [];
         exec($command_line_string,$output,$interpret_ret_val);
     
-       
         if($interpret_ret_val == 0){
             $delta_count = $delta_count + 1;
             $output_string =  implode("\n",$output);
-            
             $my_name = "xvalas10xml_diffsuite".$delta_count.".out";
             file_put_contents($my_name,$output_string);
-            
             $diff_str = "diff ". $find_out_file. " " . $my_name;
+            $diff_out = [];
+            $diff_rv = 0; // define variables before exec
             exec($diff_str,$diff_out,$diff_rv);
     
             if($diff_rv == 0){
@@ -416,8 +422,7 @@ function diff_test($src_files,$out_files,$in_files,$returncode_files){
                 $invalid_tests = $invalid_tests + 1;
 
             }
-            unlink($my_name);
-            
+            unlink($my_name);  
         } 
         else {
             if($expected_value == $interpret_ret_val){
@@ -476,20 +481,21 @@ function full_test($src_files,$out_files,$in_files,$returncode_files){
             file_put_contents($rc_file,$zero);
         }
        
-        // use exec no shell_exec
         $command_line_string = "php7.4 " . $argument_constants["parse_script"] . " <" . $source_file;
-        $output = "";
+        $output = [];
         exec($command_line_string,$output,$parse_ret_val);
-        
         if($parse_ret_val == 0){
             $delta_count = $delta_count + 1;
             $output_string = "";
             $output_string =  implode("\n",$output);
+
             // create file to store parse output
             $my_name = "xvalas10xml_testsuite".$delta_count.".out";
             file_put_contents($my_name,$output_string);
             // create executional string
             $interpret_string = "python3.8 ".$argument_constants["interpret_script"]. " --source=" . $my_name . " --input=".$find_in_file;
+            $interpret_output = [];
+            $interpret_retval = 0;  // define variables before exec
             exec($interpret_string,$interpret_output,$interpret_retval);
 
             if($interpret_retval == 0) {
@@ -498,8 +504,9 @@ function full_test($src_files,$out_files,$in_files,$returncode_files){
                 $diff_name = "xvalas10_diff_".$delta_count.".out";
                 file_put_contents($diff_name,$interpret_output_string);
                 $diff_string = "diff ". $find_out_file. " ".$diff_name;
+                $diff_out = [];
+                $diff_rv = 0;   // define variables before exec
                 exec($diff_string,$diff_out,$diff_rv);
-
                 if($diff_rv == 0){
                     $page = $page . add_passed_row($test_name,$diff_rv);
                     $accepted_tests = $accepted_tests + 1;
@@ -533,9 +540,9 @@ function full_test($src_files,$out_files,$in_files,$returncode_files){
             }
         }
     }
-   $page = generate_review($tests_counter,$accepted_tests,$invalid_tests) . $page;
-   $page = $page . html_end_gen();
-   echo $page;
+    $page = generate_review($tests_counter,$accepted_tests,$invalid_tests) . $page;
+    $page = $page . html_end_gen();
+    echo $page;
 }
 
 
@@ -570,7 +577,6 @@ function parse_test($src_files,$out_files,$in_files,$returncode_files){
         $out_exist = in_array($find_out_file,$out_files);
         check_if_exist($out_exist,$find_out_file);
     
-        // get expected return value
         $rc_exist = in_array($rc_file,$returncode_files);
       
         $expected_value = 0;
@@ -583,7 +589,7 @@ function parse_test($src_files,$out_files,$in_files,$returncode_files){
         }
         // use exec no shell_exec
         $command_line_string = "php7.4 " . $argument_constants["parse_script"] . " <" . $source_file;
-        $output = "";
+        $output = [];
         exec($command_line_string,$output,$parse_ret_val);
        
         if($parse_ret_val == 0){
@@ -597,7 +603,8 @@ function parse_test($src_files,$out_files,$in_files,$returncode_files){
             $tmp_name = "temporary_delta_ipptestsuite".$delta_count.".xml";
             file_put_contents($tmp_name,"");
             $xml_str = "java -jar ".$argument_constants["jexamxml"]." ".$find_out_file." ".$my_name." ".$tmp_name." ".$argument_constants["jexamconfig"];
-            
+            $compare = [];
+            $script_retval = 0; // define variables before exec
             exec($xml_str,$compare,$script_retval);
     
             if($script_retval == 0){        
@@ -620,9 +627,9 @@ function parse_test($src_files,$out_files,$in_files,$returncode_files){
             }
         }
     }
-   $page = generate_review($tests_counter,$accepted_tests,$invalid_tests) . $page;
-   $page = $page . html_end_gen();
-   echo $page;
+    $page = generate_review($tests_counter,$accepted_tests,$invalid_tests) . $page;
+    $page = $page . html_end_gen();
+    echo $page;
 }
 
 
