@@ -1,0 +1,5 @@
+K riešeniu je priložený Makefile, ktorý zostaví projekt (make).
+Ten je následne k dispozícii v adresári /run. 
+Spustenie projektu na referenčnom virtuálnom stroji v adresári /run je možné pomocou príkazu sudo ./ipk-sniffer [argumenty]
+Pre vyčistenie projektového adresára a zbavenie sa súborov vytvorených prekladom je možné použiť v koreňovom adresári príkaz make clean. 
+Príklad spustenia: sudo ./ipk-sniffer -i ens33 -n 10
