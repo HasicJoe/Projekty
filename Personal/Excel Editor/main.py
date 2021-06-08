@@ -172,6 +172,7 @@ def multiple_dfs(df_list, sh_name, file_name, spaces,col_len,l_rozvoz,l_zvoz,l_m
     header_fmt = workbook.add_format({'font_name': 'Arial', 'font_size': 10,
     'bold': True,'bg_color': '#303030'})
     row = 0
+    
     for dataframe in df_list:
         dataframe.to_excel(writer,sheet_name=sh_name,startrow=row , startcol=0,index=False)
         if row == 0:
@@ -195,7 +196,7 @@ def multiple_dfs(df_list, sh_name, file_name, spaces,col_len,l_rozvoz,l_zvoz,l_m
     
     for i in range (0,len(head_month)):
         worksheet.write(0,i,head_month[i],text_format)
-
+    #############################DONE TO THIS##################################
     bar["value"] = 58
     leng = len(l_rozvoz)+ 1
     second_graph_posit = len(l_rozvoz)+ 24

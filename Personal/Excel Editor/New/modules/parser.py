@@ -2,6 +2,10 @@ import os
 import sys
 import re
 import pandas
+import xlsxwriter
+from openpyxl import load_workbook
+from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
+from openpyxl.utils import get_column_letter
 from datetime import datetime
 from modules.values import Values
 from modules.frames import Frame
@@ -84,4 +88,38 @@ class Parser():
         curr_direc = os.getcwd()
         date = datetime.now().strftime('%Y_%m_%d_%H:%M:%S')
         filename = curr_direc + 'SDS_TN-' + date + '.xlsx'
-        print(filename)
+        
+        header_depo_day = ['Deň', 'Počet rozvozov', 'Hmotnosť rozvoz',
+        'Počet zvozov', 'Hmotnosť zvoz', 'Σ (Rozvoz + zvoz)']
+        header_depo_month = ['Mesiac', 'Počet rozvozov', 'Hmotnosť rozvoz',
+        'Počet zvozov', 'Hmotnosť zvoz', 'Σ (Rozvoz + zvoz)']
+        
+        writer = pandas.ExcelWriter(filename,engine='xlsxwriter')
+        workbook  = writer.book   
+        header_fmt = workbook.add_format({'font_name': 'Arial', 'font_size': 10,
+        'bold': True, 'bg_color': '#303030'})
+        print(type(depo.month_list))
+        depo_data = [depo.month_dataframe, depo.day_dataframe]
+        row = 0
+        for dataframe in depo_data:
+            dataframe.to_excel(writer, 'Depo', startrow=row, startcol=0, index=False)
+            if row == 0:
+                worksheet = writer.sheets['Depo']
+                worksheet.autofilter(row,0,row,5)
+            row += len(dataframe.index) + 2 + 1
+        
+        #design
+        worksheet.set_row(0,60)
+        worksheet.set_column(0,0,10)
+        worksheet.set_column(1,1,12)
+        worksheet.set_column(2,2,13)
+        worksheet.set_column(3,3,9)
+        worksheet.set_column(4,4,12)
+        worksheet.set_column(5,5,12)
+        text_format = workbook.add_format({'text_wrap': True, "bold": True,
+        'font_color': '#f1f1f1', "bg_color":"#303030", "valign":"vcenter", "align":"center"})
+        
+        for i in range (0, len(header_depo_month)):
+            worksheet.write(0, i, header_depo_month[i], text_format)
+        
+            

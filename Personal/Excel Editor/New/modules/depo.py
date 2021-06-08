@@ -22,6 +22,7 @@ class Depo():
         self.kgs_mnths = []
         self.months = []
         self.month_list = []
+        self.month_dataframe = None
     
     def add_rozvoz_month_kgs(self,value):
         self.kgs_rozvoz.append(value)
@@ -64,6 +65,9 @@ class Depo():
             
             self.add_monthly_perf(month_performance)
             self.reset_values_monthly()
+        
+        self.month_dataframe = pandas.DataFrame(self.month_list, columns = ['Mesiac', 
+        'Počet rozvozov', 'Hmotnosť rozvoz', 'Počet zvozov', 'Hmotnosť zvoz', 'Σ (Rozvoz + zvoz)'])
                
         #print(self.day_list)  
         #print("________________________________________________________")      
