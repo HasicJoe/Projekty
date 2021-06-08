@@ -5,6 +5,8 @@ from tkinter import filedialog as fd
 import pandas
 import numpy as np
 import re
+from datetime import datetime
+from datetime import date
 import random
 import os
 from openpyxl import load_workbook
@@ -12,8 +14,6 @@ from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 from openpyxl.utils import get_column_letter
 import xlsxwriter
 import sys
-from matplotlib import pyplot as plt
-from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 
@@ -325,9 +325,9 @@ def write_emp(emp,writer):
 def parse_file(filename):
     bar["value"] = 10
     root.update()
-    spec_columns = ["Meno vodiča","Dátum výkonu","počet doručených stopov",
-    "hmotnosť doručených objednávok","počet zvezených stopov","hmotnosť zvezených objednávok",
-    "počet stopov rozvoz","počet stopov zvoz"]
+    spec_columns = ["Meno vodiča", "Dátum výkonu", "počet doručených stopov",
+    "hmotnosť doručených objednávok", "počet zvezených stopov", "hmotnosť zvezených objednávok",
+    "počet stopov rozvoz", "počet stopov zvoz"]
     excel_data_df = pandas.read_excel(filename,usecols=spec_columns,dtype={'Meno vodiča': str,
     'počet doručených stopov': int,'hmotnosť doručených objednávok': float,
     'počet zvezených stopov': int,'hmotnosť zvezených objednávok': float,
