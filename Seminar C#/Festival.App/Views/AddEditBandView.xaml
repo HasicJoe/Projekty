@@ -1,0 +1,358 @@
+﻿<UserControl x:Class="Festival.App.Views.AddEditBandView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:converter="clr-namespace:Festival.App.Converters"
+      xmlns:local="clr-namespace:Festival.App.Views"
+      xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+      mc:Ignorable="d" 
+      xmlns:viewModel="clr-namespace:Festival.App.ViewModels"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      d:DesignHeight="505" d:DesignWidth="665"
+      d:DataContext="{d:DesignInstance viewModel:AddEditBandViewModel}"
+      >
+    <UserControl.Resources>
+        <converter:PassThroughConverter x:Key="PassThroughConverter"/>
+    </UserControl.Resources>
+    <Grid x:Name="MainGrid">
+
+
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="450"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Button 
+                Content="Save Band"
+                FontSize="14"
+                Grid.Row="1"
+                Grid.Column="1"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Margin="0 0 50 85"
+                Width="150"
+                Height="50"
+                Style="{StaticResource RoundedButtonGreenTheme  }"
+                Command="{Binding SaveBandCommand}"
+                />
+
+        <Button 
+            Content="Remove Band"
+            FontSize="14"
+            Grid.Row="1"
+            Grid.Column="1"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="0 0 50 25"
+            Width="150"
+            Height="50"
+            Style="{StaticResource RoundedButtonRedTheme}"
+            Command="{Binding DeleteBandCommand}"
+        />
+
+
+        <TextBlock Grid.Column="0"
+                   Text="Band name:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="20 27.5 0 0"/>
+        <TextBox Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Foreground="White"
+                 FontSize="20"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 Margin="210 27.5 50 0"
+                 Text="{Binding BandName}"/>
+
+
+        <TextBlock Grid.Column="0"
+                   Text="Band description:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="20 87.5 0 0"/>
+        <TextBox Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Foreground="White"
+                 FontSize="20"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 Margin="210 87.5 50 0"
+                 Text="{Binding BandDesc}"/>
+
+        <TextBlock Grid.Column="0"
+                   Text="Genre"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="20 137.5 0 0"/>
+        <TextBox Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Foreground="White"
+                 FontSize="20"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 Margin="210 137.5 50 0"
+                 Text="{Binding Genre}"/>
+
+        <TextBlock Grid.Column="0"
+                   Text="Country of origin:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="20 187.5 0 0"/>
+        <TextBox Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Foreground="White"
+                 FontSize="20"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 Margin="210 187.5 50 0"
+                 Text="{Binding CountryOfOrigin}"/>
+
+        <TextBlock Grid.Column="0"
+                   Text="Program description:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="20 237.5 0 0"/>
+        <TextBox Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Foreground="White"
+                 FontSize="20"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 Margin="210 237.5 50 0"
+                 Text="{Binding ProgramDescription}"/>
+
+        <TextBlock Grid.Column="0"
+                   Text="Image url:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="20 287.5 0 0"/>
+        <TextBox Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Foreground="White"
+                 FontSize="20"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 Margin="210 287.5 50 0"
+                 Text="{Binding BandImageUrl}"/>
+
+        <TextBlock Grid.Column="0"
+                   Text="Band members"
+                   Foreground="White"
+                   FontSize="15"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="20 337.5 0 0"/>
+
+
+
+        <Button Name="AddNewMemberButton"
+                Grid.Column="0"
+                Height="20"
+                Width="20"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Style="{StaticResource AddButtonTheme}"
+                Margin="130,338,0,0"
+                Command="{Binding NewBandMemberCommand}"
+                CommandParameter="{Binding ElementName=PopupAddMember}">
+        </Button>
+
+        <ScrollViewer Grid.Column="0"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Left"
+                      Width="430"
+                      Margin="20 367.5 0 25">
+            <ListBox x:Name="ListBoxBandMembers" ItemsSource="{Binding BandMembers, UpdateSourceTrigger=PropertyChanged}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Height="50">
+                            <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="390"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.ColumnSpan="2"
+                                        Background="White"
+                                        CornerRadius="15"
+                                        Margin="1"
+                                />
+                            <Ellipse Grid.Column="0" 
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Left"
+                                     Margin="15 0 0 0"
+                                     Width="40"
+                                     Height="40">
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="{Binding ImageUrl,UpdateSourceTrigger=PropertyChanged }"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            
+                                <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" 
+                                           MaxWidth="270"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           Margin="60 0 0 0"
+                                           FontSize="15"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <Button 
+                                    HorizontalAlignment="Right"
+                                    Style="{StaticResource ExitButtonTheme}"
+                                    Width="25"
+                                    Height="25"
+                                    Command="{Binding ElementName=ListBoxBandMembers, Path=DataContext.DeleteBandMemberCommand}" 
+                                    CommandParameter="{Binding Id}"
+                                    Margin="0 0 5 0"/>
+                                <Button 
+                                    HorizontalAlignment="Right"
+                                    Style="{StaticResource EditButtonTheme}"
+                                    Width="25"
+                                    Height="25"
+                                    Margin="0 0 35 0"
+                                    Command="{Binding ElementName=ListBoxBandMembers, Path=DataContext.EditBandMemberCommand}"
+                                    >
+                                <Button.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource PassThroughConverter}">
+                                        <Binding Path="Id"/>
+                                        <Binding ElementName="PopupAddMember" Path="."/>
+                                    </MultiBinding>
+                                </Button.CommandParameter>
+                            </Button>
+                        </Grid>
+
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+
+
+        <materialDesign:DialogHost Grid.Column="0" Name="PopupAddMember" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsOpen="False">
+            <materialDesign:DialogHost.DialogContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Background="{DynamicResource PrimaryHueMidBrush}" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" />
+
+                    <TextBlock Grid.Column="0"
+                               Text="Name:"
+                               Foreground="Black"
+                               FontSize="15"
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left"
+                               Margin="10 10 0 0"/>
+
+                    <TextBox Grid.Column="0"
+                             Foreground="Black"
+                             FontSize="15"
+                             Width="250"
+                             MaxWidth="260"
+                             VerticalAlignment="Top"
+                             HorizontalAlignment="Left"
+                             Margin="110 5 10 0"
+                             Text="{Binding Member.Name, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Grid.Column="0"
+                               Text="Nickname:"
+                               Foreground="Black"
+                               FontSize="15"
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left"
+                               Margin="10 50 0 0"/>
+
+                    <TextBox Grid.Column="0"
+                             Foreground="Black"
+                             FontSize="15"
+                             Width="250"
+                             MaxWidth="260"
+                             VerticalAlignment="Top"
+                             HorizontalAlignment="Left"
+                             Margin="110 45 10 0"
+                             Text="{Binding Member.NickName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Grid.Column="0"
+                               Text="Headmember:"
+                               Foreground="Black"
+                               FontSize="15"
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left"
+                               Margin="10 100 0 0"/>
+
+                    <CheckBox Grid.Column="0"
+                                 Foreground="Black"
+                                 IsChecked="{Binding Member.HeadMember, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                 VerticalAlignment="Top"
+                                 HorizontalAlignment="Left"
+                                 Margin="120 100 0 0"/>
+
+                    <TextBlock Grid.Column="0"
+                               Text="Image url:"
+                               Foreground="Black"
+                               FontSize="15"
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left"
+                               Margin="10 150 0 0"/>
+
+                    <TextBox Grid.Column="0"
+                             Foreground="Black"
+                             FontSize="15"
+                             Width="250"
+                             MaxWidth="260"
+                             VerticalAlignment="Top"
+                             HorizontalAlignment="Left"
+                             Margin="110 145 10 0"
+                             Text="{Binding Member.ImageUrl, UpdateSourceTrigger=PropertyChanged}"/>
+                    
+                    <TextBlock Grid.Column="0"
+                               Text="Birth date"
+                               Foreground="Black"
+                               FontSize="15"
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left"
+                               Margin="10 200 0 0"/>
+                    <Calendar Grid.Column="0"
+                              Margin="10 220 10 0"
+                              DisplayMode="Decade"
+                              DisplayDate="1/1/2000"
+                              DisplayDateStart="1/1/1920"
+                              DisplayDateEnd="1/1/2020"
+                              SelectedDate="{Binding Member.BirthDate, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <StackPanel Grid.Row="1" Margin="8" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Column="0" Grid.ColumnSpan="2">
+                        <Button Content="Save"
+                                Command="{Binding AddBandMemberCommand}"
+                                CommandParameter="{Binding }"
+                                Style="{DynamicResource MaterialDesignFlatButton}"/>
+                        <Button Content="Close"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="0" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+
+    </Grid>
+</UserControl>

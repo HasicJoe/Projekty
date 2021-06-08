@@ -1,0 +1,94 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Style BasedOn="{StaticResource {x:Type ToggleButton}}"
+           TargetType="{x:Type RadioButton}"
+           x:Key="MenuButtonHomeTheme">
+
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border VerticalAlignment="Stretch"
+                                HorizontalAlignment="Stretch"
+                                Background="{TemplateBinding Background}">
+
+                            <TextBlock Text="{TemplateBinding Property=Content}"
+                                       VerticalAlignment="Center"
+                                       Margin="50 0 0 0"/>
+
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+
+            </Setter>
+
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style.Setters>
+
+
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="#9984D4"></Setter>
+
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Border VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"
+                              
+                              CornerRadius="0 20 20 0">
+
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="4,0">
+                                        <GradientStop Color="#EE6C4D" Offset="0.0"/>
+                                        <GradientStop Color="#2D5362" Offset="0.15"/>
+                                        <GradientStop Color="#264653" Offset="0.22"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30"/>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <materialDesign:PackIcon Grid.Column="1" 
+                                                             Kind="Home" 
+                                                             HorizontalAlignment="Center"
+                                                             VerticalAlignment="Center"
+                                                             Width="30"
+                                                             Height="30"
+  
+                                                             Foreground="White"/>
+                                    <Ellipse Grid.Column="0"
+                                             Width="15"
+                                             Height="15"
+                                             Fill="White"/>
+
+                                    <TextBlock Grid.Column="2" Text="{TemplateBinding Property=Content}"
+                                           VerticalAlignment="Center"
+                                           Margin="0 0 0 0"
+                                           Foreground="White"
+                                           FontSize="19"
+                                           TextDecorations="Underline"
+                                           FontWeight="Bold"/>
+                                </Grid>
+
+
+
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+
+
+    </Style>
+</ResourceDictionary>

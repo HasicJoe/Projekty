@@ -1,0 +1,178 @@
+﻿<UserControl x:Class="Festival.App.Views.AddEditStageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="505" d:DesignWidth="665"
+             xmlns:viewModel="clr-namespace:Festival.App.ViewModels"
+             d:DataContext="{d:DesignInstance viewModel:AddEditStageViewModel}">
+
+    <Grid>
+
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Button
+            Content="Save Stage"
+            FontSize="14"
+            Grid.Row="2"
+            Grid.Column="1"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="0 0 50 85"
+            Width="150"
+            Height="50"
+            Style="{StaticResource RoundedButtonGreenTheme  }"
+            Command="{Binding SaveStageCommand}" />
+
+        <Button
+            Content="Remove Stage"
+            FontSize="14"
+            Grid.Row="2"
+            Grid.Column="1"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="0 0 50 25"
+            Width="150"
+            Height="50"
+            Style="{StaticResource RoundedButtonRedTheme  }"
+            Command="{Binding DeleteStageCommand}" />
+
+
+        <TextBlock Grid.Column="0"
+                   Text="Stage name:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="25 27.5 0 0" />
+
+        <TextBox Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Foreground="White"
+                 FontSize="20"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 Margin="200 23.5 50 0"
+                 Text="{Binding StageName}" />
+
+
+        <TextBlock Grid.Column="0"
+                   Text="Stage description:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="25 87.5 0 0" />
+
+        <TextBox Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Foreground="White"
+                 FontSize="20"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 Margin="200 83.5 50 0"
+                 Text="{Binding StageDesc}" />
+
+        <TextBlock Grid.Column="0"
+                   Text="Image url:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="25 137.5 0 0" />
+
+        <TextBox
+
+            x:Name="TextBox"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Foreground="White"
+            FontSize="20"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Stretch"
+            Margin="200 133.5 50 0"
+            Text="{Binding StageImageUrl}" />
+
+
+        <Grid VerticalAlignment="Top"
+              HorizontalAlignment="Center"
+              Grid.Row="1"
+              Grid.Column="1"
+              Margin="25 35 50 15">
+            
+            <Image 
+                   Stretch="Uniform"
+                   Source="{Binding ElementName=TextBox, Path=Text, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+
+
+        <TextBlock Grid.Column="0"
+                   Grid.Row="1"
+                   Text="Performances:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="25 15 0 0" />
+
+
+        <ScrollViewer Grid.Column="0"
+                      Grid.Row="1"
+                      Grid.RowSpan="2"
+                      Margin="15 50 0 25"
+                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Stretch">
+            <ListBox x:Name="ListBoxStagePerformers"
+                     ItemsSource="{Binding Performers, UpdateSourceTrigger=PropertyChanged}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Height="80">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.ColumnSpan="2"
+                                    Background="White"
+                                    CornerRadius="15"
+                                    Margin="1" />
+                           
+                            <TextBlock MaxWidth="270"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       Margin="20 0 0 0"
+                                       FontSize="15"
+                                       TextTrimming="CharacterEllipsis"
+                                       FontWeight="Bold">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0}&#x0a;start:&#x09;{1}&#x0a;end:&#x09;{2}">
+                                        <Binding Path="BandName"/>
+                                        <Binding Path="TimeStart" StringFormat="d"/>
+                                        <Binding Path="TimeEnd" StringFormat="d"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            
+                        </Grid>
+
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+    </Grid>
+
+</UserControl>

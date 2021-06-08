@@ -1,0 +1,38 @@
+﻿<Application x:Class="Festival.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Festival.App"
+             xmlns:viewModels="clr-namespace:Festival.App.ViewModels"
+             xmlns:views="clr-namespace:Festival.App.Views"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="BlueGrey" SecondaryColor="Lime" />
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.light.xaml" />
+                <ResourceDictionary Source="Themes/MenuButtonBandsTheme.xaml"/>
+                <ResourceDictionary Source="Themes/MenuButtonPerformancesTheme.xaml"/>
+                <ResourceDictionary Source="Themes/MenuButtonProgramTheme.xaml"/>
+                <ResourceDictionary Source="Themes/MenuButtonHomeTheme.xaml"/>
+                <ResourceDictionary Source="Themes/ExitButtonTheme.xaml"/>
+                <ResourceDictionary Source="Themes/MinimizeButtonTheme.xaml"/>
+                <ResourceDictionary Source="Themes/MaximizeButtonTheme.xaml"/>
+                <ResourceDictionary Source="Themes/AddButtonTheme.xaml"/>
+                <ResourceDictionary Source="Themes/EditButtonTheme.xaml"/>
+                <ResourceDictionary Source="Themes/RoundedButtonGreenTheme.xaml"/>
+                <ResourceDictionary Source="Themes/RoundedButtonRedTheme.xaml"/>
+                <ResourceDictionary Source="Themes/ComboBoxStyle.xaml"/>
+                <ResourceDictionary Source="Themes/BandListItemTheme.xaml" />
+                <ResourceDictionary Source="Themes/StageListItemTheme.xaml" />
+
+
+
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

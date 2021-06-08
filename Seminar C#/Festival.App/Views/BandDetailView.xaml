@@ -1,0 +1,179 @@
+﻿<UserControl x:Class="Festival.App.Views.BandDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Festival.App.Views"
+             xmlns:viewModels="clr-namespace:Festival.App.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance viewModels:BandDetailViewModel}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height ="Auto" MaxHeight="380" MinHeight="220"></RowDefinition>
+            <RowDefinition Height ="Auto" MaxHeight="100"></RowDefinition>
+            <RowDefinition Height ="Auto"></RowDefinition>
+            <RowDefinition Height ="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>  
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MaxWidth="380"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Row="0" Grid.Column="0"
+               Margin="10,0,10,0"
+               MaxHeight="340"
+               Source="{Binding Band.ImageUrl}">
+            <Image.Style>
+                <Style TargetType="Image">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+        <StackPanel Grid.Column="2" Margin="30,10,10,10">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="5,5,0,0"/>
+                </Style>
+            </StackPanel.Resources>
+                <TextBlock 
+                Foreground="White"
+                FontSize="22"
+                VerticalAlignment="Center"
+                Margin="0,0,0,8"
+                HorizontalAlignment="Left"
+                Width="auto"
+                Text="{Binding Band.Name}"/>
+            <TextBlock
+                Foreground="Gainsboro"
+                FontSize="16"
+                VerticalAlignment="Center"
+                Margin="0,8,0,8"
+                HorizontalAlignment="Left"
+                Width="auto"
+                Text="{Binding Band.CountryOfOrigin}"/>
+            <TextBlock
+                Foreground="Gainsboro"
+                FontSize="16"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Left"
+                Margin="0,8,0,8"
+                Width="auto"
+                Text="{Binding Band.Genre}"/>
+
+            <ListView MaxHeight="120"
+                      Foreground="White"
+                      FontSize="16"
+                      Margin="-10,10,0,5"
+                      ItemsSource="{Binding Band.BandMembers}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Margin="50,10,0,10">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="5,5,8,0"/>
+                </Style>
+            </StackPanel.Resources>
+            <TextBlock  
+                Foreground="White"
+                FontSize="22"
+                Margin="0,0,0,8"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Left"
+                Width="auto">Band</TextBlock>
+            <TextBlock
+                Foreground="Gainsboro"
+                FontSize="16"
+                VerticalAlignment="Center"
+                Margin="0,8,0,8"
+                HorizontalAlignment="Left"
+                Width="auto">Country of Origin</TextBlock>
+            <TextBlock
+                Foreground="Gainsboro"
+                FontSize="16"
+                VerticalAlignment="Center"
+                Margin="0,8,0,8"
+                HorizontalAlignment="Left"
+                Width="auto"
+                >Genre</TextBlock>
+            <TextBlock 
+                Foreground="Gainsboro"
+                FontSize="16"
+                VerticalAlignment="Center"
+                Margin="0,16,0,8"
+                HorizontalAlignment="Left"
+                Width="auto">Bandmembers</TextBlock>
+        </StackPanel>
+        <TextBlock Grid.Column="0" Grid.Row="1"
+            Foreground="Gainsboro"
+            FontSize="16"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Left"
+            Margin="30,20,0,5"
+            Width="auto">Band Description:</TextBlock>
+        <TextBlock Grid.Column="0" Grid.Row="2"
+            Foreground="Gainsboro"
+            FontSize="16"
+            Margin="30,5,0,5"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Left"
+            Width="auto">Program Description:</TextBlock>
+
+        <TextBlock Grid.Row ="1"
+            Grid.ColumnSpan="3"
+            Foreground="Gainsboro"
+            Margin="200,20,0,8"
+            FontSize="16"
+            TextWrapping="Wrap" 
+            Text="{Binding Band.BandDescription}"/>
+        <TextBlock Grid.Row ="2" Grid.ColumnSpan="3"
+            Foreground="Gainsboro"
+            Margin="200,8,0,5"
+            FontSize="16"
+            TextWrapping="Wrap" 
+            Text="{Binding Band.ProgramDescription}"/>
+       
+
+        
+        <GroupBox Grid.Row="4" Height="auto" Header="Band events" Grid.ColumnSpan="3" Margin="100,15,100,10">
+            <StackPanel Orientation="Horizontal">
+                <ListView
+                    Foreground="White"
+                    FontSize="16"
+                    ItemsSource="{Binding StageNames}"/>
+                <ListView
+                    Foreground="White"
+                    Height="auto"
+                    FontSize="16"
+                    ItemStringFormat="dd.MM.yyyy HH:mm"
+                    Margin="40,0,0,0"
+                    ItemsSource="{Binding Band.Performances}"
+                    DisplayMemberPath="TimeStart"/>
+
+                <ListView
+                    Foreground="White"
+                    Margin="20,0,10,0"
+                    FontSize="16"
+                    ItemsSource="{Binding Band.Performances}"
+                    DisplayMemberPath="TimeEnd"
+                    ItemStringFormat="dd.MM.yyyy HH:mm"
+                />
+            </StackPanel>
+        </GroupBox>
+        <Button Grid.Row="5" 
+                Grid.Column="1" 
+                HorizontalAlignment="Center" 
+                HorizontalContentAlignment="Center" 
+                Margin="0,10,0,0"
+                Command="{Binding ReturnCommand}">Back to program list</Button>
+    </Grid>
+</UserControl>

@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Festival.DAL", "Festival.DAL\Festival.DAL.csproj", "{16CBF1B7-479F-4841-80CA-98132A36E01F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Festival.DAL.Tests", "Festival.DAL.Tests\Festival.DAL.Tests.csproj", "{1D594E80-D2E5-44F9-9711-17BDE9BF12CB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Festival.BL", "Festival.BL\Festival.BL.csproj", "{1D6DB0A9-C0DA-4CD6-BA98-B1A39EDDE902}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Festival.BL.Tests", "Festival.BL.Tests\Festival.BL.Tests.csproj", "{B00B080B-9BF6-4B8A-934D-8C7D392E27EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{19B60BCD-8CB8-4453-BDAD-4EE928DF5307}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Festival.App", "Festival.App\Festival.App.csproj", "{87031369-977A-418B-9B2C-220C5E9AADDC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{16CBF1B7-479F-4841-80CA-98132A36E01F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16CBF1B7-479F-4841-80CA-98132A36E01F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16CBF1B7-479F-4841-80CA-98132A36E01F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16CBF1B7-479F-4841-80CA-98132A36E01F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D594E80-D2E5-44F9-9711-17BDE9BF12CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D594E80-D2E5-44F9-9711-17BDE9BF12CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D594E80-D2E5-44F9-9711-17BDE9BF12CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D594E80-D2E5-44F9-9711-17BDE9BF12CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D6DB0A9-C0DA-4CD6-BA98-B1A39EDDE902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D6DB0A9-C0DA-4CD6-BA98-B1A39EDDE902}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D6DB0A9-C0DA-4CD6-BA98-B1A39EDDE902}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D6DB0A9-C0DA-4CD6-BA98-B1A39EDDE902}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B00B080B-9BF6-4B8A-934D-8C7D392E27EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B00B080B-9BF6-4B8A-934D-8C7D392E27EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B00B080B-9BF6-4B8A-934D-8C7D392E27EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B00B080B-9BF6-4B8A-934D-8C7D392E27EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87031369-977A-418B-9B2C-220C5E9AADDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87031369-977A-418B-9B2C-220C5E9AADDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87031369-977A-418B-9B2C-220C5E9AADDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87031369-977A-418B-9B2C-220C5E9AADDC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B3CC5058-72CA-42E1-A08F-5C616FE4869C}
+	EndGlobalSection
+EndGlobal

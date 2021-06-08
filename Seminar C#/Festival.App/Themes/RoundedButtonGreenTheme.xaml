@@ -1,0 +1,99 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+
+    <Style BasedOn="{StaticResource {x:Type Button}}"
+           TargetType="{x:Type Button}"
+           x:Key="RoundedButtonGreenTheme">
+
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border VerticalAlignment="Stretch"
+                                HorizontalAlignment="Stretch"
+                                CornerRadius="15" 
+                                BorderThickness="0">
+                            <Border.Background>
+                                <SolidColorBrush Color="White"/>
+                            </Border.Background>
+
+                            <TextBlock Text="{TemplateBinding Property=Content}"
+                                       Foreground="Black"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontSize="{TemplateBinding Property=FontSize}"/>
+
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+
+            </Setter>
+        </Style.Setters>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border VerticalAlignment="Stretch"
+                                HorizontalAlignment="Stretch"
+                                CornerRadius="15"
+                                BorderThickness="0">
+                                <Border.Background>
+                                    <SolidColorBrush Color="#2E933C"/>
+                                </Border.Background>
+
+                                <TextBlock Text="{TemplateBinding Property=Content}"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontSize="{TemplateBinding Property=FontSize}"/>
+
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+
+                </Setter>
+            </Trigger>
+
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    CornerRadius="15"
+                                    BorderThickness="0">
+                                <Border.Background>
+                                    <SolidColorBrush Color="#226D2C"/>
+                                </Border.Background>
+
+                                <TextBlock Text="{TemplateBinding Property=Content}"
+                                           Foreground="#C2C2C2"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           FontSize="{TemplateBinding Property=FontSize}"/>
+
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+
+
+
+
+
+
+
+
+
+
+
+    </Style>
+
+
+</ResourceDictionary>

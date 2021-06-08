@@ -1,0 +1,316 @@
+﻿<UserControl x:Class="Festival.App.Views.AddPerformanceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             xmlns:viewModel="clr-namespace:Festival.App.ViewModels"
+             xmlns:converter="clr-namespace:Festival.App.Converters"
+             d:DesignHeight="505" d:DesignWidth="665"
+             d:DataContext="{d:DesignInstance viewModel:AddPerformanceViewModel}"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <UserControl.Resources>
+        <converter:MultiDateConverter x:Key="MultiDateConverter"/>
+    </UserControl.Resources>
+    <Grid>
+
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="450" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Button
+            Content="Save performance"
+            FontSize="14"
+            Grid.Row="1"
+            Grid.Column="1"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="0 0 50 85"
+            Width="150"
+            Height="50"
+            Style="{StaticResource RoundedButtonGreenTheme}"
+            Command="{Binding SavePerformanceCommand}"
+            />
+
+        <Button
+            Content="Remove performance"
+            FontSize="14"
+            Grid.Row="1"
+            Grid.Column="1"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
+            Margin="0 0 50 25"
+            Width="150"
+            Height="50"
+            Style="{StaticResource RoundedButtonRedTheme  }"
+            Command="{Binding DeletePerformanceCommand}" />
+
+
+        <ComboBox
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"
+            Width="200"
+            Height="30"
+            Margin="150 25 0 0"
+            Text="{Binding Model.Band.Name}"
+            x:Name="ComboBoxBand"
+
+            FontWeight="Bold"
+            FontSize="15"
+            MaxDropDownHeight="250"
+
+            Background="Transparent"
+            Foreground="Black"
+            BorderThickness="0 0 0 2"
+            IsReadOnly="True"
+            IsEditable="True"
+            materialDesign:TextFieldAssist.UnderlineBrush="White"
+            BorderBrush="White"
+            materialDesign:ComboBoxAssist.ClassicMode="True"
+            materialDesign:ThemeAssist.Theme="Light"
+            ItemsSource="{Binding Bands}"
+            SelectedItem="{Binding Model.Band}">
+            <ComboBox.ItemContainerStyle>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </ComboBox.ItemContainerStyle>
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+
+        </ComboBox>
+
+
+        <TextBlock Grid.Column="0"
+                   Text="Band:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="25 27.5 0 0" />
+
+
+        <ComboBox
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"
+            Width="200"
+            Height="30"
+            Margin="150 85 0 0"
+            Text="{Binding Model.Stage.Name}"
+            x:Name="ComboBoxStage"
+
+            FontWeight="Bold"
+            FontSize="15"
+            MaxDropDownHeight="250"
+
+            Background="Transparent"
+            Foreground="Black"
+            BorderThickness="0 0 0 2"
+            IsReadOnly="True"
+            IsEditable="True"
+            materialDesign:TextFieldAssist.UnderlineBrush="White"
+            BorderBrush="White"
+            materialDesign:ComboBoxAssist.ClassicMode="True"
+            materialDesign:ThemeAssist.Theme="Light"
+            ItemsSource="{Binding Stages}"
+            SelectedItem="{Binding Model.Stage}">
+            <ComboBox.ItemContainerStyle>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </ComboBox.ItemContainerStyle>
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Grid.Column="0"
+                   Text="Stage:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="25 87.5 0 0" />
+
+        <TextBlock Grid.Column="0"
+                   Text="Start Time:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="25 147.5 0 0" />
+
+        <Button 
+            Grid.Column="0"
+            Width="200"
+            Height="30"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Left"
+            Margin="150 137.5 0 0"
+            FontSize="15"  
+            IsEnabled="True"
+            Background="White"
+                Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                CommandTarget="{Binding ElementName=PopupStartTime}">
+            <Button.Content>
+                <MultiBinding Converter="{StaticResource MultiDateConverter}" UpdateSourceTrigger="PropertyChanged">
+                    <Binding Path="DateStart" UpdateSourceTrigger="PropertyChanged"></Binding>
+                    <Binding Path="Model.TimeStart" UpdateSourceTrigger="PropertyChanged"></Binding>
+                </MultiBinding>
+            </Button.Content>
+        </Button>
+
+
+
+
+        <materialDesign:DialogHost Name="PopupStartTime" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsOpen="False">
+            <materialDesign:DialogHost.DialogContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.ColumnSpan="2" Grid.RowSpan="2" Background="#607D8B"/>
+                    <Border Background="{DynamicResource PrimaryHueMidBrush}" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" />
+                    <Calendar x:Name="Calendar1" Margin="-1 34 -1 -2" Grid.Column="0" Grid.Row="0" SelectedDate="{Binding DateStart}"/>
+                    <materialDesign:Clock DisplayAutomation="Cycle" x:Name="Clock1" Grid.Column="1" Grid.Row="0" Time="{Binding Model.TimeStart}"/>
+                    <StackPanel Grid.Row="1" Margin="8" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Column="0" Grid.ColumnSpan="2">
+                        <Button Content="OK" Foreground="White"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="1" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                        <Button Content="CANCEL" Foreground="White" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="0" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+
+        <materialDesign:DialogHost Name="PopupCollision" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   IsOpen="False">
+            <materialDesign:DialogHost.DialogContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Row="0" HorizontalAlignment="Center" Orientation="Vertical">
+                        <TextBlock Margin="8" FontSize="20" Text="Collision with another performance detected!"/>
+                        <TextBlock Margin="8" FontSize="20" Text="Please choose different time"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                        <Button Content="OK" Foreground="Black"  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+
+
+        <TextBlock Grid.Column="0"
+                   Text="End Time:"
+                   Foreground="White"
+                   FontSize="20"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="25 207.5 0 0" />
+
+
+        <Button            Grid.Column="0"
+                           Width="200"
+                           Height="30"
+                           VerticalAlignment="Top"
+                           HorizontalAlignment="Left"
+                           Margin="150 197.5 0 0"
+                           FontSize="15"
+                           IsEnabled="True"
+                           Background="White"
+                           Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                           CommandTarget="{Binding ElementName=PopupEndTime}">
+            <Button.Content>
+                <MultiBinding Converter="{StaticResource MultiDateConverter}" UpdateSourceTrigger="PropertyChanged">
+                    <Binding Path="DateEnd" UpdateSourceTrigger="PropertyChanged"></Binding>
+                    <Binding Path="Model.TimeEnd" UpdateSourceTrigger="PropertyChanged"></Binding>
+                </MultiBinding>
+            </Button.Content>
+        </Button>
+
+        <materialDesign:DialogHost Name="PopupEndTime" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsOpen="False">
+            <materialDesign:DialogHost.DialogContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.ColumnSpan="2" Grid.RowSpan="2" Background="#607D8B"/>
+                    <Border Background="{DynamicResource PrimaryHueMidBrush}" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" />
+                    <Calendar x:Name="Calendar2" Margin="-1 34 -1 -2" Grid.Column="0" Grid.Row="0" SelectedDate="{Binding DateEnd, UpdateSourceTrigger=PropertyChanged}"/>
+                    <materialDesign:Clock DisplayAutomation="Cycle" x:Name="Clock2" Grid.Column="1" Grid.Row="0" Time="{Binding Model.TimeEnd, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel Grid.Row="1" Margin="8" HorizontalAlignment="Right" Orientation="Horizontal" Grid.Column="0" Grid.ColumnSpan="2">
+                        <Button Content="OK" Foreground="White" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="1" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                        <Button Content="CANCEL" Foreground="White" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="0" Style="{DynamicResource MaterialDesignFlatButton}"/>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+
+        <Grid Column="0"
+              ColumnSpan="2"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              Margin="0 250 210 50">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" 
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                Text="Band"
+                FontSize="25"
+                FontWeight="Bold"
+                Foreground="White"/>
+            <TextBlock Grid.Column="1" 
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Center"
+                       Text="Stage"
+                       FontSize="25"
+                       FontWeight="Bold"
+                       Foreground="White"/>
+            <Image Grid.Column="0" 
+                VerticalAlignment="Center"
+                   Margin="10 35 10 10"
+                   Stretch="Uniform"
+                   Source="{Binding ElementName=ComboBoxBand, Path=SelectedItem.ImageUrl , UpdateSourceTrigger=PropertyChanged}"/>
+            <Image Grid.Column="1" 
+                   VerticalAlignment="Center"
+                   Margin="10 35 10 10"
+                   Stretch="Uniform"
+                   Source="{Binding Model.Stage.ImageUrl, UpdateSourceTrigger=PropertyChanged}" />
+
+        </Grid>
+
+
+
+
+    </Grid>
+
+</UserControl>
