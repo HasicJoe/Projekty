@@ -4,7 +4,6 @@ from tkinter.ttk import Progressbar,Style
 from tkinter import filedialog as fd
 from modules.parser import Parser
 
-
 class Window():
     def __init__(self,root, bar, label):
         self.root = root

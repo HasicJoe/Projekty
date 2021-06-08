@@ -2,8 +2,11 @@ import os
 import sys
 import re
 import pandas
+from datetime import datetime
 from modules.values import Values
 from modules.frames import Frame
+from modules.depo import Depo
+from modules.empl import Empl
 
 class Parser():
     def __init__(self, filename,window):
@@ -62,4 +65,23 @@ class Parser():
             excel_data_df.loc[record,'Dátum výkonu'] = new_format
                 
         self.inc_bar()
-            
+        self.parse_data(excel_data_df, lists)
+        
+        
+    def parse_data(self, df, lists):
+        depo = Depo()
+        depo.parse_depo_daily(df, lists) 
+        self.inc_bar()
+        depo.parse_depo_monthly(df, lists)
+        self.inc_bar()
+        empl = Empl()
+        empl.parse_empl(df, lists)
+        self.inc_bar()
+        self.create_sheet(depo,empl)
+        #print(empl.emp_performance)
+        
+    def create_sheet(self, depo, empl):
+        curr_direc = os.getcwd()
+        date = datetime.now().strftime('%Y_%m_%d_%H:%M:%S')
+        filename = curr_direc + 'SDS_TN-' + date + '.xlsx'
+        print(filename)

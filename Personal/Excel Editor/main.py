@@ -388,7 +388,7 @@ root.geometry('720x500')
 
 progress_bar = ttk.Progressbar(root, orient="horizontal",mode="determinate", maximum=100, value=0)
 progress_bar.start()
-progress_bar.step(10)
+progress_bar.step(5)
 progress_bar["value"] = 0
 
 root.update()
