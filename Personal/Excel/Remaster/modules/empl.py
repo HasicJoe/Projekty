@@ -1,10 +1,12 @@
 import re
+import pandas
 
 class Empl():
     def __init__(self):
         self.emp_names = []
         self.emp_months = []
         self.emp_performance = []
+        self.emp_result = None
         
         #employee attr
         self.name = ''
@@ -53,6 +55,12 @@ class Empl():
             round(self.uspesnost_rozvoz, 2), round(self.uspesnost_zvoz, 2)]
             self.add_performance(performance)
             self.reset_attr()
+            
+        self.emp_result = pandas.DataFrame(self.emp_performance, columns = [
+        'Meno vodiča', 'Mesiac výkonu', 'Počet stopov rozvoz',
+        'Počet stopov zvoz', 'Hmotnosť obj. rozvoz', 'Hmotnosť obj. zvoz',
+        'Počet doručených stopov', 'Počet zvezených stopov', 
+        'Σ (Rozvoz + zvoz)', '% úsp. rozvoz', '% úst. zvoz'])
 
     
     def reset_attr(self):

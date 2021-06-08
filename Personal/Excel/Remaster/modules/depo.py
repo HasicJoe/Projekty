@@ -59,7 +59,7 @@ class Depo():
             self.add_zvoz_month_kgs(self.hmotnost_zvozu_mon)
             self.add_kgs_mnths(month_fix_value)
             
-            month_performance = [month_fix_value, self.pocet_zvozov_mon,
+            month_performance = [month_fix_value, self.pocet_rozvozov_mon,
             round(self.hmotnost_rozvozu_mon,2), self.pocet_zvozov_mon,
             round(self.hmotnost_zvozu_mon, 2), sum]
             
