@@ -33,7 +33,7 @@ def init_label(root,ex):
     elif ex == 1:
         label = ttk.Label(root, text = 'Invalid source data', background='#303030', foreground='#f1f1f1')
     else:
-        ttk.Label(root, text = 'Internal error', background='#303030', foreground='#f1f1f1')
+        label = ttk.Label(root, text = 'Internal error', background='#303030', foreground='#f1f1f1')
         
     label.grid(column = 1, row = 3, pady = 20)
     return label
@@ -52,18 +52,25 @@ def open_excel_file(window):
 def main():
     
     """ Main window setup """
+    
     root = tk.Tk()
+    root.iconbitmap(r'C:\Users\samue\desktop\projekty\Projekty\Personal\Excel\Remaster\sds.ico')
     root.configure(background='#303030')
     root.title('Nahrať štatistiky')
-    root.geometry('720x500')
+    root.geometry('1300x800')
+    
+    root.columnconfigure(0, minsize=450)
+    root.columnconfigure(1, minsize=300)
+    root.columnconfigure(2, minsize=450)
     
     root.update()
     style = Style()
     style.configure('W.TButton', font = ('calibri', 11,), foreground = '#303030')
 
     window = Window(root, init_bar(root), init_label(root,0))
-    open_button = ttk.Button(root, text='Vybrať súbor', style = 'W.TButton', command = lambda: open_excel_file(window))
-    open_button.grid(column=1, row=1, sticky='', padx=300, pady=100)
+    open_button = ttk.Button(root, text='Vybrať súbor', 
+    width = 20, style = 'W.TButton', command = lambda: open_excel_file(window))
+    open_button.grid(column=1, row=1, sticky='', padx=150, pady=100)
 
     root.mainloop()
     

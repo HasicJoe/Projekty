@@ -2,11 +2,15 @@ import os
 import re
 import pandas
 import xlsxwriter
+import tkinter as tk
+from tkinter import ttk
+from tkinter.ttk import Progressbar,Style
 from datetime import datetime
 from modules.values import Values
 from modules.frames import Frame
 from modules.depo import Depo
 from modules.empl import Empl
+from modules.stats import Stats
 
 class Parser():
     def __init__(self, filename,window):
@@ -24,6 +28,11 @@ class Parser():
     def parse_file(self,filename):
         self.inc_bar()
         self.window.root.update()
+        
+        if filename is None:
+            self.rv = Values.INVALID_FILE
+            return
+        
         if not re.match('^.+(xlsx|xls)$', filename.name):
             self.rv = Values.INVALID_FILE
             return 
@@ -39,6 +48,29 @@ class Parser():
         'počet stopov zvoz': float})
         
         lists = Frame()
+        
+        stats = Stats(excel_data_df)
+        
+        date = ttk.Label(self.window.root, 
+        text = 'Analyzované obdobie: ' + str(stats.first_date) + ' - ' + str(stats.last_date), 
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        date.grid(column = 1, row = 4, pady = 10, padx=20)
+        
+        count = ttk.Label(self.window.root, 
+        text = 'Celkový počet výkonov: ' + str(stats.count), 
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        count.grid(column = 1, row = 5, pady = 10, padx=20)
+        
+        
+        month_stats = ttk.Label(self.window.root, 
+        text = 'PRIEMERNÉ MESAČNÉ ŠTATISTIKY', 
+        background='#303030', foreground='#f1f1f1', anchor='w', font='Helvetica 13 bold')
+        month_stats.grid(column = 0, row = 6, pady = 10, padx=20)
+        
+        full_stats = ttk.Label(self.window.root, 
+        text = 'CELKOVÉ ŠTATISTIKY', 
+        background='#303030', foreground='#f1f1f1', anchor='w', font='Helvetica 13 bold')
+        full_stats.grid(column = 2, row = 6, pady = 10, padx=20)
         
         for record in excel_data_df.index:
             # update invalid floats
@@ -68,15 +100,60 @@ class Parser():
                 
         self.inc_bar()
         self.window.root.update()
-        self.parse_data(excel_data_df, lists)
+        self.parse_data(excel_data_df, lists, stats)
         
+    def display_stats(self, stats):
+        average_rozvoz = ttk.Label(self.window.root, 
+        text = 'Priemerný mesačný rozvoz: ' + str(stats.average_month_rozvoz),
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        average_rozvoz.grid(column = 0, row = 7, pady = 10, padx=20)
         
-    def parse_data(self, df, lists):
+        average_zvoz = ttk.Label(self.window.root, 
+        text = 'Priemerný mesačný zvoz: ' + str(stats.average_month_zvoz),
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        average_zvoz.grid(column = 0, row = 8, pady = 10, padx=10)
+        
+        average_rozvoz_kgs = ttk.Label(self.window.root, 
+        text = 'Priemerná hmotnosť rozvoz: ' + str(stats.average_month_rozvoz_kgs)  + ' kg',
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        average_rozvoz_kgs.grid(column = 0, row = 9, pady = 10, padx=20)
+        
+        average_zvoz_kgs = ttk.Label(self.window.root, 
+        text = 'Priemerná hmotnosť zvoz: ' + str(stats.average_month_zvoz_kgs) + ' kg',
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        average_zvoz_kgs.grid(column = 0, row = 10, pady = 10, padx=20)
+        
+        sum_rozvoz = ttk.Label(self.window.root, 
+        text = 'Celkový rozvoz: ' + str(stats.pocet_rozvozov),
+        background='#303030', foreground='#f1f1f1', font = ('Arial' , 11))
+        sum_rozvoz.place(anchor='w')
+        sum_rozvoz.grid(column = 2, row = 7, pady = 10, padx=0)
+        
+        sum_zvoz = ttk.Label(self.window.root, 
+        text = 'Celkový zvoz: ' + str(stats.pocet_zvozov), 
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        sum_zvoz.grid(column = 2, row = 8, pady = 10, padx=0)
+        
+        sum_rozvoz_kgs = ttk.Label(self.window.root, 
+        text = 'Celková hmotnosť rozvoz: ' + str(stats.hmotnost_rozvoz) + ' kg',
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        sum_rozvoz_kgs.grid(column = 2, row = 9, pady = 10, padx=0)
+        
+        sum_zvoz_kgs = ttk.Label(self.window.root, 
+        text = 'Celková hmotnosť zvoz: ' + str(stats.hmotnost_zvoz) + ' kg',
+        background='#303030', foreground='#f1f1f1', anchor='w', font = ('Arial' , 11))
+        sum_zvoz_kgs.grid(column = 2, row = 10, pady = 10, padx=0)
+        self.window.root.update()
+    
+        
+    def parse_data(self, df, lists, stats):
         depo = Depo()
         depo.parse_depo_daily(df, lists) 
         self.inc_bar()
         self.window.root.update()
         depo.parse_depo_monthly(df, lists)
+        stats.calculate_average(depo.month_dataframe)
+        self.display_stats(stats)
         self.inc_bar()
         self.window.root.update()
         empl = Empl()
