@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Vehicles{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+<!-- overriden default flash message block to display message without page reload -->
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+<div class="container mt-5 d-flex justify-content-center">
+    <button type="submit" class="btn btn-outline-success btn-lg" id="add-vehicle-modal">Add vehicle</button>
+</div>
+<div class="container mt-5">
+    <table id="vehicles" class="table table-hover">
+        <caption>
+            Vehicles info
+        </caption>
+    </table>
+</div>
+
+<div class="modal fade" id="add-vehicle" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="add" method="POST">
+            <div class="modal-header">
+                <h5 class="modal-title">Add vehicle data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="error-edit-alert" class="alert alert-success alert-dismissible fade" role="alert">
+                    <span></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="add-license_plate" name="add-license_plate">
+                    <label for="add-license_plate">License plate</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select class="form-select" id="add-type" name="add-type">
+                        <option value="bus">bus</option>
+                        <option value="train">train</option>
+                    </select>
+                    <label for="add-type">License plate</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" id="add-1st-capacity" name="add-1st-capacity">
+                    <label for="add-1st-capacity">First class capacity</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" id="add-2nd-capacity" name="add-2nd-capacity">
+                    <label for="add-2nd-capacity">Second class capacity</label>
+                </div>
+                <div class="mb-3">
+                    <label for="add-description" class="form-label">Description</label>
+                    <textarea class="form-control" id="add-description" name="add-description" rows="3" ></textarea>
+                
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="edit-vehicles" tabindex="-2">
+    <div class="modal-dialog">
+        <form class="modal-content" id="edit" method="POST">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit vehicle data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="error-edit-alert" class="alert alert-success alert-dismissible fade" role="alert">
+                    <span></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="edit-license_plate" name="edit-license_plate" readonly>
+                    <label for="text-license_plate">License plate</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select class="form-select" id="edit-vehicle-type" name="edit-vehicle-type">
+                        <option value="bus">bus</option>
+                        <option value="train">train</option>
+                    </select>
+                    <label for="edit-vehicle-type">Vehicle type</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" id="edit-first-capacity" name="edit-first-capacity">
+                    <label for="edit-first-capacity">1st class capacity</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" id="edit-second-capacity" name="edit-second-capacity">
+                    <label for="edit-second-capacity">2nd class capacity</label>
+                </div>
+             
+                <div class="mb-3">
+                    <label for="edit-description" class="form-label">Description</label>
+                    <textarea class="form-control" id="edit-description" name="edit-description" rows="3" ></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        new bootstrap.Modal(document.getElementById('edit-vehicles'));
+        $('#vehicles').DataTable( {
+            "ajax"    : "/operator/manage_vehicles2json",
+            "columns" : [
+                { data : "license_plate",  title : "License plate" },
+                { data : "vehicle_type",   title : "Vehicle type" },
+                { data : "first_class_capacity",   title : "1st class capacity" },
+                { data : "second_class_capacity",   title : "2nd class capacity" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "<button type='button' class='btn btn-outline-primary' data-bs-toggle='modal'\
+                        data-bs-target='#edit-vehicles'\
+                        data-bs-license_plate='"+row.license_plate+"'\
+                        data-bs-vehicle_type='"+row.vehicle_type+"'\
+                        data-bs-1capacity='"+row.first_class_capacity+"'\
+                        data-bs-2capacity='"+row.second_class_capacity+"'\
+                        data-bs-description='"+row.description+"'>Edit vehicle</button>\
+                        <button type='button' onclick='deleteVehicle(\""+row.license_plate+"\");' class='btn btn-outline-danger'>Delete vehicle</button>";
+                  }
+                },
+            ]
+        });
+        /// Action on clicking edit button
+        var editModal = document.getElementById('edit-vehicles')
+        editModal.addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = event.relatedTarget;
+        // Update the modal's content. (Load user data)
+        document.getElementById('edit-license_plate').value = button.getAttribute('data-bs-license_plate');
+        document.getElementById('edit-vehicle-type').value  = button.getAttribute('data-bs-vehicle_type');
+        document.getElementById('edit-first-capacity').value  = button.getAttribute('data-bs-1capacity');
+        document.getElementById('edit-second-capacity').value  =  button.getAttribute('data-bs-2capacity');
+        document.getElementById('edit-description').value =   button.getAttribute('data-bs-description');
+        });     
+    }); 
+  
+    function deleteVehicle(license_plate) {
+        if (confirm('Do you really want to delete vehicle with license plate: ' + license_plate)) {
+            $.ajax({
+               method : "GET",
+               url : "/operator/delete_vehicle?license_plate="+license_plate,
+               success: function(data, textStatus, jqXHR) {
+                   var data_table = $('#vehicles').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Vehicle successfully deleted.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    }
+ 
+</script>
+{% endblock %}
+{% block base_ajax_post %}
+
+<script type="text/javascript">
+    $("#add-vehicle-modal").click(function(e) {
+        var myModal = new bootstrap.Modal(document.getElementById('add-vehicle'));
+        myModal.show();
+        // reset values for multiple input
+        document.getElementById('add-license_plate').value = "";
+        document.getElementById('add-1st-capacity').value = "";
+        document.getElementById('add-2nd-capacity').value = "";
+        document.getElementById('add-description').value = "";
+        e.preventDefault();
+    });
+    /// save add
+    $('form#add').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/operator/add_vehicle",
+            data: $('form#add').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                var data_table = $('#vehicles').DataTable();
+                var modal_window = bootstrap.Modal.getInstance(document.getElementById('add-vehicle'));
+                switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        modal_window.hide();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Vehicle successfully added</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Vehicle with same license plate already exists.');
+                    break;
+                    case 211:
+                        alert('You have to specify license plate.');
+                    break;
+                }
+            },
+        });
+    }); 
+    /// save edit
+    $('form#edit').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/operator/edit_vehicles",
+            data: $('form#edit').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                var data_table = $('#vehicles').DataTable();
+                var modal_window = bootstrap.Modal.getInstance(document.getElementById('edit-vehicles'));
+                switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        modal_window.hide();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Vehicle successfully edited</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal server error');
+                    break;
+                    case 211:
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-info alert-dismissible fade show\" role=\"alert\">\
+                        <span>No change.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    case 212:
+                        alert('Missing fields.');
+                    break;
+                }
+            },
+        });
+    });
+</script>
+{% endblock %}

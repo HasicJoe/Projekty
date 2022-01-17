@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% from 'components/modal.html' import modal_window as modal %}
+{% from 'components/table.html' import table %}
+
+{% block title %}Manage user accounts{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+<!-- overriden default flash message block to display message without page reload -->
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+
+<div class="container mt-5">
+    {{ table("user-data-table", "table table-hover", "User account info") }}
+</div>
+
+{% call modal("edit-user-modal", "Edit user data", "Save changes", True) %}
+<div id="modal-alert-wrapper"></div>
+<div class="form-floating mb-3">
+    <input type="text" class="form-control" id="text-id" name="text-id" readonly>
+    <label for="text-id">User id</label>
+</div>
+<div class="form-floating mb-3">
+    <input type="text" class="form-control" id="text-login-name" name="text-login-name">
+    <label for="text-login-name">Login name</label>
+</div>
+<div class="form-floating mb-3">
+    <input type="text" class="form-control" id="text-user-name" name="text-user-name">
+    <label for="text-user-name">Name</label>
+</div>
+<div class="form-floating mb-3">
+    <input type="text" class="form-control" id="text-user-surname" name="text-user-surname">
+    <label for="text-user-surname">Surname</label>
+</div>
+<div class="form-floating mb-3">
+    <input type="email" class="form-control" id="text-email" name="text-email" pattern=".+@.+\..+">
+    <label for="text-email">Email</label>
+</div>
+<div class="form-floating mb-3">
+    <input type="tel" class="form-control" id="text-phone-number" name="text-phone-number" pattern="^[+]?[()/0-9. -]{9,}$">
+    <label for="text-phone-number">Phone</label>
+</div>
+{% endcall %}
+
+<script>
+$(document).ready(function() {
+
+    /// init edit modal window
+    new bootstrap.Modal(document.getElementById('edit-user-modal'));
+
+    $('#user-data-table').DataTable( {
+        "ajax"    : "/administrator/manage_users_data",
+        "columns" : [
+            { data : "id",           title : "id" },
+            { data : "login_name",   title : "login" },
+            { data : "user_name",    title : "name" },
+            { data : "user_surname", title : "surname" },
+            { data : "email",        title : "email" },
+            { data : "phone_number", title : "phone" },
+            { defaultContent : "", orderable : false,
+            render : function ( data, type, row, meta ) {
+                return "<button type='button' class='btn btn-outline-primary' data-bs-toggle='modal'\
+                    data-bs-target='#edit-user-modal'\
+                    data-bs-id='"+row.id+"'\
+                    data-bs-login-name='"+row.login_name+"'\
+                    data-bs-user-name='"+row.user_name+"'\
+                    data-bs-user-surname='"+row.user_surname+"'\
+                    data-bs-email='"+row.email+"'\
+                    data-bs-phone-number='"+row.phone_number+"'>Edit</button>\
+                    <button type='button' onclick='deleteUser("+row.id+");' class='btn btn-outline-danger'>Delete</button>";
+            }
+            },
+        ]
+    });
+
+    /// Action on clicking edit button
+    var editModal = document.getElementById('edit-user-modal')
+    editModal.addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = event.relatedTarget;
+
+        // Update the modal's content. (Load user data)
+        document.getElementById('text-id').value =              button.getAttribute('data-bs-id');
+        document.getElementById('text-login-name').value =      button.getAttribute('data-bs-login-name');
+        document.getElementById('text-user-name').value =       button.getAttribute('data-bs-user-name');
+        document.getElementById('text-user-surname').value =    button.getAttribute('data-bs-user-surname');
+        document.getElementById('text-email').value =           button.getAttribute('data-bs-email');
+        document.getElementById('text-phone-number').value =    button.getAttribute('data-bs-phone-number');
+
+        // remove alerts from last dialog with window
+        $('#modal-alert-wrapper').html("");
+    });
+}); 
+
+function deleteUser(id) {
+    if (confirm('Do you really want to delete user with id: ' + id)) {
+        $.ajax({
+            method : "POST",
+            url : "/administrator/delete_users?id="+id,
+            data : id,
+            success: function(data, textStatus, jqXHR) {
+                var data_table = $('#user-data-table').DataTable();
+                data_table.ajax.reload();
+                bs_alert('alert-wrapper', 'User successfully deleted', 'success');
+            } 
+        });
+    }
+}
+
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+</script>
+{% endblock %}
+
+{% block base_ajax_post %}
+<script type="text/javascript">
+     /// save edit
+    $('form').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/administrator/manage_users",
+            data: $('form').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                switch(jqXHR.status) {
+                    case 200:
+                        var data_table =    $('#user-data-table').DataTable();
+                        data_table.ajax.reload();
+                        $('#edit-user-modal').modal('toggle');
+                        bs_alert('alert-wrapper', "User data successfully updated.", "success")
+                    break;
+                    default:
+                    case 210:
+                       $('#edit-user-modal').modal('toggle');
+                        bs_alert('alert-wrapper', "User with this ID does not exist.", "danger")
+                    break;
+                    case 211:
+                        bs_alert('modal-alert-wrapper', "Entered login name is not unique.", "danger")
+                        document.getElementById('text-login-name').value = "";
+                    break;
+                    case 212:
+                       
+                         bs_alert('modal-alert-wrapper', "Entered email is not unique.", "danger")
+                         document.getElementById('text-email').value =  "";
+                    break;
+                    case 213:
+                        bs_alert('modal-alert-wrapper', "All fields must be filled out.", "warning")
+                    break;
+                }
+            },
+           
+        });
+    });
+</script>
+{% endblock %}

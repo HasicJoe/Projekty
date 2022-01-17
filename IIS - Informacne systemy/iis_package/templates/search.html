@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %} Search {% endblock %}
+
+{%block body_content %}
+
+<form class="row mx-auto mt-5 alert alert-primary pe-0" style="width:30%;">
+    <h2 class="mb-3">Lookup connections</h2>
+    <div class="col-10">
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control form-control-lg" id="floatingInput" placeholder=" ">
+            <label for="floatingInput">Starting stop</label>
+        </div>
+        <div class="form-floating">
+            <input type="text" class="form-control form-control-lg" id="floatingInput" placeholder=" ">
+            <label for="floatingInput">Exit stop</label>
+        </div>
+    </div>
+    <div class="col-1 ps-0 pe-0 me-0">
+        <button type="button" class="btn btn-primary h-100"><span class="bi-arrow-down-up h2"></span></button>
+    </div>
+
+    <div class="col-6 mt-2">
+        <label for="date" class="h6">Date</label>
+        <input type="date" name="date" class="form-control" id="date">
+    </div>
+
+    <div class="col-3 mt-2">
+        <label for="time" class="h6">Time</label>
+        <input type="time" name="time" class="form-control" id="time">
+    </div>
+</form>
+
+{% endblock %}

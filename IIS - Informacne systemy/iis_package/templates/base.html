@@ -1,0 +1,84 @@
+{% from 'components/alert.html' import alert %}
+
+<!-- bootstrap script dependencies -->
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>      
+
+<!DOCTYPE html>
+<html lang="sk-SK">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="icon/ico"/>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"/>
+        <link rel="stylesheet" href="{{ url_for('static', filename='icons/bootstrap-icons.css')}}"/>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/edited.css') }}"/>
+        <!-- use this block to add additional css links -->
+        {% block additional_css %}{% endblock %}
+        <title>{% block title %}Base title{% endblock %}</title>
+    </head>
+
+    <script>
+            
+    </script>
+
+    <body>
+        <!-- base navbar for all pages -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar">
+                <div class="navbar-nav" id="left-nav-bar">
+                   <a class="navbar-brand p-0 m-0" href="/search"><img src="{{ url_for('static', filename='logo.jpeg') }}" class="p-0 m-0" height="128"/></a>
+                </div>
+                <a id="user-info" type="button" data-bs-trigger="hover" data-bs-html="true" data-bs-toggle="popover" title="User info" data-bs-content="Unknown">
+                </a>
+                <div class="navbar-nav ms-auto" id="right-nav-bar"></div>
+            </div>
+        </nav>
+
+        <!-- load navbar based on logged user -->
+        <script src="/get_nav_bar"></script>
+
+        <!-- flashed messages -->
+        <!-- category represents bootstrap color class = {primary, secondary, success, warning danger, light, dark, info}-->
+        {% block flash_messages %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {{ alert(message, category) }}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        {% endblock %}
+        
+        <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+
+        <!-- html content of sub-template pages -->
+        <div class="container-fluid">
+            {% block body_content %}
+            <h1>override this block in sub templates</h1>
+            {% endblock %}
+        </div>
+
+        <!-- if post method is allowed use ajax to prevent refreshing page -->
+        {% block base_ajax_post %}
+            {% if link %}
+            
+            <script type="text/javascript">
+                $('form').on('submit', function(e) {
+                    e.preventDefault();
+                    $.post('{{ link }}',$('form').serialize());
+                    
+                });
+            </script>
+           
+            {% endif %}
+        {% endblock %}
+
+  
+        <!-- use this block to add script in sub-templates-->
+        {% block additional_scripts %}{% endblock %}
+    </body>
+</html>

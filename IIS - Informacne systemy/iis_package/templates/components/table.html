@@ -1,0 +1,14 @@
+{#
+    simple html table wrapper
+    @table_id - id of the table element
+    @table_class - bootstrap class of table ... { table, table-*, ... }
+
+    usage - {{ table(table_id, table_class, caption) }}
+#}
+{% macro table(table_id, table_class, caption) -%}
+<table id="{{ table_id }}" class="{{ table_class }}">
+    {% if caption %}
+    <caption>{{ caption }}</caption>
+    {% endif %}
+</table>
+{% endmacro %}

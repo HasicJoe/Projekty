@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% from 'components/table.html' import table %}
+{% from 'components/modal.html' import modal_window as modal %}
+{% from 'components/modal.html' import modal_window_large as modal_lg %}
+
+{% block title %}Confirm connections{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content -%}
+
+<ul class="nav nav-tabs mt-5" id="confirm-connections-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="new-connections-tab" 
+        data-bs-toggle="tab" data-bs-target="#new-connections" 
+        type="button" role="tab">Confirm new connections</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="edited-connections-tab"
+        data-bs-toggle="tab" data-bs-target="#edited-connections" 
+        type="button" role="tab">Confirm edited connections</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="confirm-connections-tab-content">
+
+    <div id="new-connections" class="tab-pane fade show active mt-5" role="tabpanel">
+        {{ table('confirm-new-connections-table', 'table table-hover w-100') }}
+    </div>
+    <div id="edited-connections" class="tab-pane fade mt-5">
+        {{ table('confirm-edited-connections-table', 'table table-hover w-100') }}
+    </div>
+</div>
+
+{% call modal('confirm-modal', 'Confirm modal', 'Confirm', False) -%}
+<span id="confirm-modal-text"></span>
+{% endcall %}
+
+{% call modal_lg('detail-new-connection', 'Connection detail', 'OK', False) -%}
+<div class="row">
+    <span class="col-6 h4">Connection name</span>
+    <span id="connection-name" class="col-6 h4"></span>
+    <span class="col-6">Operator</span>
+    <span id="operator-name" class="col-6"></span>
+    <hr class='mt-3'/>
+    <span class="col-6">Interval</span>
+    <span class="col-6" id="interval"></span>
+    <span class="col-6">Vehicle license plate</span>
+    <span class="col-6" id="vehicle-license-plate"></span>
+    <span class="col-6">Vehicle first class capacity</span>
+    <span class="col-6" id="vehicle-first-class-capacity"></span>
+    <span class="col-6">Vehicle second class capacity</span>
+    <span class="col-6" id="vehicle-second-class-capacity"></span>
+    <table class='table table-borderless mt-5'>
+        <thead>
+            <th>Stop name</th>
+            <th>Arrival time</th>
+            <th>Departure time</th>
+        </thead>
+        <tbody id="routes">
+
+        </tbody>
+    </table>    
+</div>
+{% endcall %}
+
+{% call modal_lg('detail-edited-connection', 'Connection details', 'OK', False) -%}
+<div class="row">
+    <div class="row col-6 border-light border-end">
+        <span class="col-6 h4">Connection name</span>
+        <span id="connection-name-org" class="col-6 h4"></span>
+        <span class="col-6">Operator</span>
+        <span id="operator-name-org" class="col-6"></span>
+        <hr class='mt-3'/>
+        <span class="col-6">Interval</span>
+        <span class="col-6" id="interval-org"></span>
+        <span class="col-6">Vehicle license plate</span>
+        <span class="col-6" id="vehicle-license-plate-org"></span>
+        <span class="col-6">Vehicle first class capacity</span>
+        <span class="col-6" id="vehicle-first-class-capacity-org"></span>
+        <span class="col-6">Vehicle second class capacity</span>
+        <span class="col-6" id="vehicle-second-class-capacity-org"></span>
+        <table class='table table-borderless mt-5'>
+            <thead>
+                <th>Stop name</th>
+                <th>Arrival time</th>
+                <th>Departure time</th>
+            </thead>
+            <tbody id="routes-org">
+
+            </tbody>
+        </table>    
+    </div>
+    <div class="row col-6">
+        <span class="col-6 h4">Connection name</span>
+        <span id="connection-name-edit" class="col-6 h4"></span>
+        <span class="col-6">Operator</span>
+        <span id="operator-name-edit" class="col-6"></span>
+        <hr class='mt-3'/>
+        <span class="col-6">Interval</span>
+        <span class="col-6" id="interval-edit"></span>
+        <span class="col-6">Vehicle license plate</span>
+        <span class="col-6" id="vehicle-license-plate-edit"></span>
+        <span class="col-6">Vehicle capacity</span>
+        <span class="col-6" id="vehicle-capacity-edit"></span>
+        <table class='table table-borderless mt-5'>
+            <thead>
+                <th>Stop name</th>
+                <th>Arrival time</th>
+                <th>Departure time</th>
+            </thead>
+            <tbody id="routes-edit">
+
+            </tbody>
+        </table>    
+    </div>
+</div>
+{% endcall %}
+
+
+<script>
+    $(document).ready(function() {
+
+        var confirm_modal = new bootstrap.Modal(document.getElementById('confirm-modal'));
+        var new_detail_modal = new bootstrap.Modal(document.getElementById('detail-new-connection'));
+        new bootstrap.Modal(document.getElementById('detail-edited-connection'));
+
+        $('#detail-new-connection-action-btn').hide(true);
+
+        $('#confirm-new-connections-table').DataTable({
+            "ajax" : "/administrator/new_connections_data",
+            "columns" : [
+                { data : "id",        title : "Id" },
+                { data : "link_name", title : "Name" },
+                { data : "interval",  title : "Interval", visible : false },
+                { defaultContent : "", title : 'Interval', 
+                  render : function( data, type, row, meta ) {
+                        var days = [ 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+                        var val = ''
+                        for (var i = 0; i < 8; ++i) {
+                            val += ((row.interval >> i) & 1) ? days[i] + ', ' : '';
+                        }
+                        return val!="" ? val.substr(0, val.length-2) : '';
+                  }},
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta) {
+                        return  "\
+                            <button class='btn btn-outline-success'\
+                            onclick='acceptNew(this, "+row.id+");'>Accept</button>\
+                            <button class='btn btn-outline-danger'\
+                            onclick='abortNew(this, "+row.id+");'>Abort</button>\
+                            <button class='btn btn-outline-info'\
+                             onclick='showDetailsNew(this, "+row.id+");'>Details</button>"
+                  }
+                }
+            ]
+        });
+
+        $('#confirm-edited-connections-table').DataTable({
+            "ajax" : "/administrator/edited_connections_data",
+            "columns" : [
+                { data : "id",        title : "Id" },
+                { data : "link_name", title : "Name" },
+                { data : "interval",  title : "Interval", visible : false },
+                { defaultContent : "", title : 'Interval', 
+                  render : function( data, type, row, meta ) {
+                        var days = [ 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+                        var val = ''
+                        for (var i = 0; i < 8; ++i) {
+                            val += ((row.interval >> i) & 1) ? days[i] + ', ' : '';
+                        }
+                        return val!="" ? val.substr(0, val.length-2) : '';
+                  }},
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta) {
+                    return  "\
+                        <nobr>\
+                        <button class='btn btn-outline-success'\
+                        onclick='acceptEdited(this, "+row.id+");'>Accept incoming change</button>\
+                        <button class='btn btn-outline-danger'\
+                        onclick='abortEdited(this, "+row.id+");'>Keep original</button>\
+                        <button class='btn btn-outline-info'\
+                        onclick='showDetailsEdited(this, "+row.id+");'>Details</button>\
+                        </nobr>"
+                  }
+                }
+            ]
+        });
+
+    });
+
+function openConfirmWindow(msg, action) {
+    var confirm_modal = bootstrap.Modal.getInstance(document.getElementById('confirm-modal'));
+    $('#confirm-modal-text').html(msg);
+    $('#confirm-modal-action-btn').on('click', function() {
+        action();
+    });
+    confirm_modal.show();
+}
+
+function acceptNew(btn, id) {
+    openConfirmWindow("Do you want to accept incoming Connection with ID: " + id, function() {
+        
+        $.ajax({
+            method : "POST",
+            url : "/administrator/confirm_connection/"+id,
+            success: function(data) {
+                bs_alert('alert-wrapper', data.msg, data.type);
+                var confirm_modal = bootstrap.Modal.getInstance(document.getElementById('confirm-modal'));
+                confirm_modal.hide();
+                $('#confirm-new-connections-table').DataTable().ajax.reload();
+            }
+        });
+    });
+}
+
+function abortNew(btn, id) {
+    openConfirmWindow("Do you want to delete incoming connection with ID: " + id, function() {
+        $.ajax({
+            method : "POST",
+            url : "/administrator/abort_connection/"+id,
+            success : function(data) {
+                if (data.success) {
+                    bs_alert('alert-wrapper', 'Connection: \"' + data.connection_name + '\" was successfully aborted', 'success');
+                } else {
+                    bs_alert('alert-wrapper', 'Internal server error', 'danger');
+                }
+
+                var confirm_modal = bootstrap.Modal.getInstance(document.getElementById('confirm-modal'));
+                confirm_modal.hide();
+                $('#confirm-new-connections-table').DataTable().ajax.reload();
+            }
+        })
+    });
+}
+
+function showDetailsNew(btn, id) {
+    $.ajax({
+        method : "GET",
+        url : "/administrator/get_connection/"+id,
+        success : function(data) {
+            if (!data.success) {
+                bs_alert('alert-wrapper', 'Could not retrieve connection data', 'danger');
+                return;
+            }
+            $('#connection-name').html(data.connection_name);
+            $('#operator-name').html(data.operator_name);
+            var days = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            var interval = ''
+            for (var i = 0; i < 8; ++i) {
+                interval += ((data.interval >> i) & 1) ? days[i] + ', ' : '';
+            }
+            $('#interval').html(interval!="" ? interval.substr(0, interval.length-2) : '');
+            $('#vehicle-license-plate').html(data.vehicle_license_plate);
+            $('#vehicle-first-class-capacity').html(data.vehicle_first_class_capacity);
+            $('#vehicle-second-class-capacity').html(data.vehicle_second_class_capacity);
+            
+            $('#routes').html("");
+            data.routes.forEach(function(route) {
+                $('#routes').append("<tr><td>"+route.stop_name+"</td><td>"+route.arrival_time+"</td><td>"+route.departure_time+"</td></tr>");
+            });
+
+            detail_modal = bootstrap.Modal.getInstance(document.getElementById('detail-new-connection'));
+            detail_modal.show();
+        }
+    });
+}
+
+function acceptEdited(btn, id) {
+    openConfirmWindow("Do you want to accept change to connection with ID: " + id, function() {
+        $.ajax({
+            method : "POST",
+            url : "/administrator/confirm_connection/"+id,
+            success: function(data) {
+                bs_alert('alert-wrapper', data.msg, data.type);
+                var confirm_modal = bootstrap.Modal.getInstance(document.getElementById('confirm-modal'));
+                confirm_modal.hide();
+                $('#confirm-edited-connections-table').DataTable().ajax.reload();
+            }
+        });
+    });
+}
+
+function abortEdited(btn, id) {
+    openConfirmWindow("Do you want to abort incoming changes to connection with ID: " + id, function() {
+        $.ajax({
+            method : "POST",
+            url : "/administrator/abort_connection/"+id,
+            success: function(data) {
+                if (data.success) {
+                    bs_alert('alert-wrapper', 'Connection: \"' + data.connection_name + '\" was successfully aborted', 'success');
+                } else {
+                    bs_alert('alert-wrapper', 'Internal server error', 'danger');
+                }
+                var confirm_modal = bootstrap.Modal.getInstance(document.getElementById('confirm-modal'));
+                confirm_modal.hide();
+                $('#confirm-edited-connections-table').DataTable().ajax.reload();
+            }
+        });
+    });
+}
+
+function showDetailsEdited(btn, id) {
+    $.ajax({
+        method : "GET",
+        url : "/administrator/get_connection/"+id,
+        success : function(data) {
+            if (!data.success) {
+                bs_alert('alert-wrapper', 'Could not retrieve connection data', 'danger');
+                return;
+            }
+            $('#connection-name-edit').html(data.connection_name);
+            $('#operator-name-edit').html(data.operator_name);
+            var days = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            var interval = ''
+            for (var i = 0; i < 8; ++i) {
+                interval += ((data.interval >> i) & 1) ? days[i] + ', ' : '';
+            }
+            $('#interval-edit').html(interval!="" ? interval.substr(0, interval.length-2) : '');
+            $('#vehicle-license-plate-edit').html(data.vehicle_license_plate);
+            $('#vehicle-first-class-capacity-edit').html(data.vehicle_first_class_capacity);
+            $('#vehicle-second-class-capacity-edit').html(data.vehicle_second_class_capacity);
+            
+            $('#routes-edit').html("");
+            data.routes.forEach(function(route) {
+                $('#routes-edit').append("<tr><td>"+route.stop_name+"</td><td>"+route.arrival_time+"</td><td>"+route.departure_time+"</td></tr>");
+            });
+            ///return;
+
+            /// load data from original version of connection
+            $.ajax({
+                method : "GET",
+                url : "/administrator/get_connection/"+data.original_id,
+                success : function(org_data) {
+                    $('#connection-name-org').html(org_data.connection_name);
+                    $('#operator-name-org').html(org_data.operator_name);
+                    var days = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                    var interval = ''
+                    for (var i = 0; i < 8; ++i) {
+                        interval += ((org_data.interval >> i) & 1) ? days[i] + ', ' : '';
+                    }
+                    $('#interval-org').html(interval!="" ? interval.substr(0, interval.length-2) : '');
+                    $('#vehicle-license-plate-org').html(org_data.vehicle_license_plate);
+                    $('#vehicle-first-class-capacity-org').html(org_data.vehicle_first_class_capacity);
+                    $('#vehicle-second-class-capacity-org').html(org_data.vehicle_second_class_capacity);
+                    
+                    $('#routes-org').html("");
+                    org_data.routes.forEach(function(route) {
+                        $('#routes-org').append("<tr><td>"+route.stop_name+"</td><td>"+route.arrival_time+"</td><td>"+route.departure_time+"</td></tr>");
+                    });
+
+                    detail_modal = bootstrap.Modal.getInstance(document.getElementById('detail-edited-connection'));
+                    detail_modal.show();
+                }
+            })
+        }
+    });
+}
+
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+</script>
+
+{%- endblock %}
+

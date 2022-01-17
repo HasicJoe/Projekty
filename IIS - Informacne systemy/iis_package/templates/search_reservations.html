@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %} Search reservations{% endblock %}
+
+{% block flash_messages %}
+
+<div id="alert-wrapper"></div>
+
+{% endblock %}
+
+{%block body_content %}
+
+
+<form id="base" class="row mx-auto mt-5 alert alert-primary pe-0" style="width:30%;">
+    <h2 class="mb-3">Seach reservations</h2>
+        <div class="form-floating col-10">
+            {% if email %}
+            <input type="email" pattern=".+@.+\..+" class="form-control" name="insertedemail"  id="insertedemail" value="{{email}}" readonly/>
+            {% else %}
+            <input type="email" pattern=".+@.+\..+" class="form-control" name="insertedemail"  id="insertedemail"/>
+            {% endif %}
+            <label class="ms-2" for="insertedemail">Email address</label>
+        </div>
+        <div class="col-1 ps-0 pe-0 me-0">
+            <button type="button" class="btn btn-primary h-100"><span class="bi bi-search h2"></span></button>
+        </div>
+        <div class="form-check ms-3 mt-2">
+            <input class="form-check-input" type="checkbox" value="" id="register" name="register">
+            <label class="form-check-label ms-1" for="register">
+            I also want to register
+            </label>
+        </div>
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-outline-dark btn-lg">Search</button>
+        </div>
+</form>
+
+<div class="modal" tabindex="-1" role="dialog" id="register-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    <div id="modal-alert-wrapper"></div>
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Registration after reservation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+      <div class="modal-body">
+        <form id="registerform" class="mx-auto">
+    <div class="form-floating mb-2" >
+        <input type="login_name"  class="form-control" name="login_name"  id="login_name"/>
+        <label for="login_name">Login name</label>
+    </div>
+    <div class="form-floating mb-2">
+        <input type="password" class="form-control" name="password"  id="password"/>
+        <label for="password">Password</label>
+    </div>
+
+    <div class="form-floating mb-2">
+        <input type="password" class="form-control" name="password2"  id="password2"/>
+        <label for="password2">Password (confirm)</label>
+    </div>
+    <div class="form-floating mb-2">
+        <input type="user_name" class="form-control" name="user_name"  id="user_name"/>
+        <label for="user_name">User name</label>
+    </div>
+    <div class="form-floating mb-2">
+        <input type="user_surname" class="form-control" name="user_surname"  id="user_surname"/>
+        <label for="user_surname">User surname</label>
+    </div>
+    <div class="form-floating mb-2">
+        <input type="email" pattern=".+@.+\..+" class="form-control" name="email"  id="email" readonly/>
+        <label for="inserted-email">Email address</label>
+    </div>
+    <div class="form-floating mb-2">
+        <input type="text" class="form-control" name="phone_number" id="phone_number" pattern="^[+]?[()/0-9. -]{9,}$"/>
+        <label for="phone_number">Phone number</label>
+    </div>
+
+    <br/>
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-outline-success btn-lg">Complete reservation and view my reservations</button>
+    </div>
+</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+</script>
+{% endblock %}
+
+{% block base_ajax_post %}
+
+<script type="text/javascript">
+ $('form#base').on('submit', function(e) {
+        e.preventDefault();
+        if(document.getElementById("register").checked){
+            $.ajax({
+                method : "POST",
+                url: "/validate_request",
+                data: $("form#base").serialize(),
+                success: function(data, textStatus, jqXHR) {
+                    if(jqXHR.status == 200){
+                        $('#register-modal').modal('show');
+                        document.getElementById("email").value = document.getElementById("insertedemail").value;
+                    }
+                    else {
+                        bs_alert('alert-wrapper', data.error, "warning");
+                    }
+                },
+            });
+            return;
+        }
+        $.ajax({
+            method : "POST",
+            url : "/my_reservations",
+            data: $('form#base').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                switch(jqXHR.status) {
+                    case 200:
+                        window.location.href = "/display_reservations?email="+data.email;
+                    break;
+                    default:
+                    case 210:
+                        bs_alert('alert-wrapper', data.error, "warning");
+                    break;
+                }
+            },
+        });
+    });
+
+     $('form#registerform').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/register",
+            data: $('form#registerform').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                switch(jqXHR.status) {
+                    case 200:
+                        var email = $('input#email').val();
+                        var password = $("input#password").val();
+                        $.ajax({
+                            method : "POST",
+                            url : "/login",
+                            data: {"login_email" : email, "password" : password },
+                            success: function(data, textStatus, jqXHR) {
+                                switch(jqXHR.status) {
+                                    case 200:
+                                        bs_alert('modal-alert-wrapper', data.data, "info");
+                                        $.ajax({
+                                            method : "POST",
+                                            url : "/transfer_user_reservations",
+                                            data: {"login_email" : email},
+                                            success: function(data, textStatus, jqXHR) {
+                                                switch(jqXHR.status) {
+                                                    case 200:
+                                                        window.location.href = "/display_reservations?email="+data.email;
+                                                    break;
+                                                }
+                                            },
+                                        });    
+                                    break;
+                                    default:
+                                }
+                            },
+                        });    
+                    break;
+                    default:
+                    case 210:
+                        bs_alert('modal-alert-wrapper', data.error, "warning");
+                    break;
+                    case 211:
+                    case 212:
+                        bs_alert('modal-alert-wrapper', data.error, "warning");
+                        document.getElementById('password').value = "";
+                        document.getElementById('password2').value = "";
+                    break;
+                    case 213:    
+                        bs_alert('modal-alert-wrapper', data.error, "warning");
+                        document.getElementById('login_name').value = "";
+                    break;
+                }
+            },
+        });
+    });
+</script>
+
+{% endblock %}

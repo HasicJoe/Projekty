@@ -1,0 +1,79 @@
+{# 
+    bootstrap 5 modal window 
+    use this macro with call tag
+    {% call macro_name(args...) %}
+    ...
+    body of the modal window
+    ...
+    {% endcall %}
+    @has_form - when True, renders modal-content as form element, and action button as submit
+#}
+{% macro modal_window(modal_id, modal_title, action_button_title, has_form=False) -%}
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1">
+    <div class="modal-dialog">
+        
+        {% if has_form %}
+        <form class="modal-content" method="POST">
+        {% else %}
+        <div class="modal-content">
+        {% endif %}
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{ modal_id}}-title">{{modal_title}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            {# specify body content #}
+            {{ caller() }}   
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                {% if has_form %}
+                <button id="{{modal_id}}-action-btn" type="submit" class="btn btn-primary">{{ action_button_title }}</button>
+                {% else %}
+                <button id="{{modal_id}}-action-btn" type="button" class="btn btn-primary">{{ action_button_title }}</button>
+                {% endif %}
+            </div>
+        {% if has_form %}
+        </form>
+        {% else %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro modal_window_large(modal_id, modal_title, action_button_title, has_form=False) -%}
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        
+        {% if has_form %}
+        <form class="modal-content" method="POST">
+        {% else %}
+        <div class="modal-content">
+        {% endif %}
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{ modal_id}}-title">{{modal_title}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            {# specify body content #}
+            {{ caller() }}   
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                {% if has_form %}
+                <button id="{{modal_id}}-action-btn" type="submit" class="btn btn-primary">{{ action_button_title }}</button>
+                {% else %}
+                <button id="{{modal_id}}-action-btn" type="button" class="btn btn-primary">{{ action_button_title }}</button>
+                {% endif %}
+            </div>
+        {% if has_form %}
+        </form>
+        {% else %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}

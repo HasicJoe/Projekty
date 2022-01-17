@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm stop changes{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+<!-- overriden default flash message block to display message without page reload -->
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+
+<div class="modal fade bd-example-modal-lg" id="edit-stop" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="exampleModalLabel"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="d-flex modal-body gx-5">
+                <form class="w-50 p-5" id="decline" method="POST">
+                   <div class="d-flex justify-content-center mb-3"><h5 class="modal-title" id="exampleModalLabel">Current values</h5></div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="edit-old-name" name="edit-old-name" readonly>
+                        <label for="edit-old-name">Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="edit-old-address" name="edit-old-address" readonly>
+                        <label for="edit-old-address">Old address</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="edit-old-latitude" name="edit-old-latitude" readonly>
+                        <label for="edit-old-latitude">Old Latitude</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="edit-old-longitude" name="edit-old-longitude" readonly>
+                        <label for="edit-old-longitude">Old Longitude</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="edit-old-description" name="edit-old-description" style="min-height: 80px;" readonly></textarea>
+                        <label for="edit-old-description" class="form-label">Old description</label>
+                    </div>
+                    <div class="d-flex justify-content-center"><button type="submit" class="btn btn-danger" data-bs-dismiss="modal"  id="acceptchange">Deny Change</button></div>
+                </form>
+                <form class="w-50 p-5" id="accept" method="POST">
+                    <div class="d-flex justify-content-center mb-3"><h5 class="modal-title">Requested values</h5></div>
+                     <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="edit-new-name" name="edit-new-name" readonly>
+                        <label for="edit-new-name">Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="edit-new-address" name="edit-new-address" readonly>
+                        <label for="edit-new-address">New address</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="edit-new-latitude" name="edit-new-latitude" readonly>
+                        <label for="edit-new-latitude">New Latitude</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="edit-new-longitude" name="edit-new-longitude" readonly>
+                        <label for="edit-new-longitude">New Longitude</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="edit-new-description" name="edit-new-description" style="min-height: 80px;" readonly></textarea>
+                        <label for="edit-new-description" class="form-label">New description</label>
+                    </div>
+                    <div class="d-flex justify-content-center"><button type="submit" class="btn btn-primary" data-bs-dismiss="modal"  id="acceptchange">Accept Change</button></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h4>Requests waiting for approval</h4>
+    <table id="waiting-request" class="table table-hover">
+    </table>
+</div>
+
+<div class="container mt-5">
+    <h4>Requests to edit stop</h4>
+    <table id="edit-stops" class="table table-hover">
+    </table>
+</div>
+
+<div class="container mt-5">
+    <h4>Requests to delete stop</h4>
+    <table id="delete-stops" class="table table-hover">
+    </table>
+</div>
+
+<script>
+ $(document).ready(function() {
+      //  new bootstrap.Modal(document.getElementById('edit-vehicles'));
+        $('#waiting-request').DataTable( {
+            "ajax"    : "/administrator/waiting_requests",
+            "columns" : [
+                { data : "name",  title : "Name" },
+                { data : "address",  title : "Address" },
+                { data : "latitude",   title : "Latitude" },
+                { data : "longitude",    title : "Longitude" },
+                { data : "description",    title : "Description" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "<button type='button' class='btn btn-success' onclick='acceptStop(\""+row.name+"\");'>Accept</button>\
+                            <button type='button' class='btn btn-outline-danger'onclick='deleteRequest(\""+row.name+"\");'>Decline</button>";
+                  }
+                },
+            ]
+        });
+        $('#delete-stops').DataTable( {
+            "ajax"    : "/administrator/requests_to_delete",
+            "columns" : [
+                { data : "name",  title : "Name" },
+                { data : "address",  title : "Address" },
+                { data : "latitude",   title : "Latitude" },
+                { data : "longitude",    title : "Longitude" },
+                { data : "description",    title : "Description" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "<button type='button' class='btn btn-outline-danger' onclick='deleteStop(\""+row.name+"\");'>Delete</button>\
+                            <button type='button' class='btn btn-success'onclick='keepCurrent(\""+row.name+"\");'>Keep Current</button>";
+                  }
+                },
+            ]
+        });
+        $('#edit-stops').DataTable( {
+            "ajax"    : "/administrator/requests_to_edit",
+            "columns" : [
+                { data : "name",  title : "Stop" },
+                { data : "request",   title : "Request to change" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "<button type='button' class='btn btn-outline-primary' data-bs-toggle='modal'\
+                        data-bs-target='#edit-stop'\
+                        data-bs-edit_name='"+row.edit_name+"'\
+                        data-bs-name='"+row.name+"'\
+                        data-bs-old_addr='"+row.old_addr+"'\
+                        data-bs-new_addr='"+row.new_addr+"'\
+                        data-bs-old_latitude='"+row.old_lat+"'\
+                        data-bs-new_latitude='"+row.new_lat+"'\
+                        data-bs-old_longitude='"+row.old_long+"'\
+                        data-bs-new_longitude='"+row.new_long+"'\
+                        data-bs-old_description='"+row.old_desc+"'\
+                        data-bs-new_description='"+row.new_desc+"'>Resolve the edit request</button>";
+                  }
+                },
+            ]
+        });
+        var editModal = document.getElementById('edit-stop')
+        editModal.addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = event.relatedTarget;
+        // Update the modal's content. (Load user data)
+        document.getElementById('edit-new-name').value =     button.getAttribute('data-bs-name');
+        document.getElementById('edit-old-name').value =     button.getAttribute('data-bs-name');
+
+        document.getElementById('edit-new-address').value =     button.getAttribute('data-bs-new_addr');
+        document.getElementById('edit-old-address').value =     button.getAttribute('data-bs-old_addr');
+
+        document.getElementById('edit-new-latitude').value =    button.getAttribute('data-bs-new_latitude');
+        document.getElementById('edit-old-latitude').value =    button.getAttribute('data-bs-old_latitude');
+
+        document.getElementById('edit-new-longitude').value =   button.getAttribute('data-bs-new_longitude');
+        document.getElementById('edit-old-longitude').value =   button.getAttribute('data-bs-old_longitude');
+
+        document.getElementById('edit-new-description').value = button.getAttribute('data-bs-new_description');
+        document.getElementById('edit-old-description').value = button.getAttribute('data-bs-old_description');
+        
+        document.getElementById('exampleModalLabel').textContent =    button.getAttribute('data-bs-edit_name');
+        });     
+    });
+    function deleteStop(name) {
+        if (confirm('Do you really want to delete stop: ' + name.replace("Delete request-",""))) {
+            $.ajax({
+               method : "POST",
+               url : "/administrator/delete_request_with_copy?name="+name,
+               data : name,
+               success: function(data, textStatus, jqXHR) {
+                   var data_table = $('#delete-stops').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Request successfuly confirmed. Stop remain. Request closed. </span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    }
+    function keepCurrent(address) {
+        if (confirm('Do you really want to keep stop with address: ' + address.replace("Delete request-",""))) {
+            $.ajax({
+               method : "POST",
+               url : "/administrator/keep_current?address="+address,
+               data : address,
+               success: function(data, textStatus, jqXHR) {
+                   var data_table = $('#delete-stops').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Request successfuly confirmed. Stop deleted. </span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    }
+    function acceptStop(address) {
+        if (confirm('Do you really want to confirm stop with address: ' + address)) {
+            $.ajax({
+               method : "POST",
+               url : "/administrator/confirm_request?address="+address,
+               data : address,
+               success: function(data, textStatus, jqXHR) {
+                   var data_table = $('#waiting-request').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Request successfuly confirmed.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    }
+    function deleteRequest(address) {
+        if (confirm('Do you really want to delete requested stop with address: ' + address)) {
+            $.ajax({
+               method : "POST",
+               url : "/administrator/delete_request?address="+address,
+               data : address,
+               success: function(data, textStatus, jqXHR) {
+                   var data_table = $('#waiting-request').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Request successfuly deleted.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    }
+</script>
+{% endblock %}
+{% block base_ajax_post %}
+<script type="text/javascript">
+    $('form#decline').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/administrator/deny_change",
+            data: $('form').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                var data_table = $('#edit-stops').DataTable();
+                var modal_window = bootstrap.Modal.getInstance(document.getElementById('edit-stop'));
+                switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        modal_window.hide();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Edit request successfully denied.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error invalid form values.');
+                    break;
+                }
+            },
+        });
+    });
+     $('form#accept').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/administrator/accept_change",
+            data: $('form').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                var data_table = $('#edit-stops').DataTable();
+                var modal_window = bootstrap.Modal.getInstance(document.getElementById('edit-stop'));
+                switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        modal_window.hide();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Edit request successfully accepted.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Missing primary key.');
+                    break;
+                    case 211:    
+                        alert('Invalid form values.');
+                    break;
+                     case 212:    
+                        alert('Cannot find requested stop.');
+                    break;
+                }
+            },
+        });
+    });
+</script>
+{% endblock %}

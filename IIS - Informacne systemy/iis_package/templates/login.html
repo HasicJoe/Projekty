@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %} Login {% endblock %}
+
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %} 
+<form method="POST" class="w-50 mx-auto">
+    <h3 class="text-center mb-4 mt-4">Login</h3>
+    <div class="form-floating mb-2">
+        <input type="login_email" class="form-control" name="login_email"  id="login_email"/>
+        <label for="login_email">Login/Email address</label>
+    </div>
+    <div class="form-floating mb-2">
+        <input type="password" class="form-control" name="password"  id="password"/>
+        <label for="password">Password</label>
+    </div>
+    <br/>
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-outline-success btn-lg">Login</button>
+    </div>
+</form>
+
+
+<script>
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+</script>
+{% endblock %}
+
+{% block base_ajax_post %}
+<script type="text/javascript">
+ $('form').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/login",
+            data: $('form').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                switch(jqXHR.status) {
+                    case 200:
+                        bs_alert('alert-wrapper', data.data, "info");
+                        delay(1500).then(() => window.location.href = "passenger/search_connection");
+                    break;
+                    default:
+                    case 210:
+                        bs_alert('alert-wrapper', data.error, "warning");
+                        document.getElementById('login_email').value = "";
+                        document.getElementById('password').value = "";
+                    break;
+                    case 211:
+                        bs_alert('alert-wrapper', data.error, "warning");
+                        document.getElementById('password').value = "";
+                    break;
+                }
+            },
+        });
+    });
+</script>
+{% endblock %}

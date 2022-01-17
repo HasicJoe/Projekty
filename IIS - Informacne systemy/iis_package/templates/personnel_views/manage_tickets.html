@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Reservations{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+<!-- overriden default flash message block to display message without page reload -->
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+
+<div class="container mt-5">
+    <h2> Unconfirmed reservations</h2>
+    <table id="reservations" class="table table-hover">
+        <caption>
+            Unconfirmed reservations
+        </caption>
+    </table>
+</div>
+
+
+<div class="container mt-5">
+    <h2> Denied reservations</h2>
+    <table id="denied-reservations" class="table table-hover">
+        <caption>
+            Denied reservation info
+        </caption>
+    </table>
+</div>
+
+<div class="container mt-5">
+    <h2> Confirmed reservations</h2>
+    <table id="confirmed-reservations" class="table table-hover">
+        <caption>
+            Confirmed reservation info
+        </caption>
+    </table>
+</div>
+
+
+
+<script>
+    $(document).ready(function() {
+        $('#reservations').DataTable( {
+            "ajax"    : "/personnel/load_reservations",
+            "columns" : [
+                { data : "id",  title : "ID" },
+                { data : "registered",   title : "User status" },
+                { data : "enter_stop",   title : "Enter stop" },
+                { data : "exit_stop",   title : "Exit stop" },
+                { data : "email",   title : "Customer email" },
+                { data : "seats", title : "Reserved seats"},
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "<button type='button' class='btn btn-outline-success' data-bs-toggle='modal'\
+                        data-bs-target='#edit-reservation'\
+                        data-bs-id='"+row.id+"'\
+                        data-bs-registered='"+row.registered+"'\
+                        data-bs-enter_stop='"+row.enter_stop+"'\
+                        data-bs-exit_stop='"+row.exit_stop+"'\
+                        data-bs-email='"+row.email+"'\
+                        onclick='allow_reservation(\""+row.id+"\");''>Allow</button>\
+                        <button type='button' onclick='deny_reservation(\""+row.id+"\");' class='btn btn-outline-danger'>Deny</button>";
+                  }
+                },
+            ]
+        });   
+
+    $('#denied-reservations').DataTable( {
+            "ajax"    : "/personnel/load_denied_reservations",
+            "columns" : [
+                { data : "id",  title : "ID" },
+                { data : "registered",   title : "User status" },
+                { data : "enter_stop",   title : "Enter stop" },
+                { data : "exit_stop",   title : "Exit stop" },
+                { data : "email",   title : "Customer email" },
+                { data : "seats", title : "Reserved seats"},
+            ]
+        });   
+
+    $('#confirmed-reservations').DataTable( {
+            "ajax"    : "/personnel/load_confirmed_reservations",
+            "columns" : [
+                { data : "id",  title : "ID" },
+                { data : "registered",   title : "User status" },
+                { data : "enter_stop",   title : "Enter stop" },
+                { data : "exit_stop",   title : "Exit stop" },
+                { data : "email",   title : "Customer email" },
+                { data : "seats", title : "Reserved seats"},
+            ]
+        });   
+    }); 
+  
+    function deny_reservation(res_id) {
+        if (confirm('Do you really want to deny reservation with id: ' + res_id)) {
+            $.ajax({
+               method : "GET",
+               url : "/personnel/deny_reservation/"+res_id,
+               success: function(data, textStatus, jqXHR) {
+                   var denied_table =$('#denied-reservations').DataTable();
+                   var data_table = $('#reservations').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        denied_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Registration successfully denied.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    }
+
+        function allow_reservation(res_id) {
+        if (confirm('Do you really want to confirm reservation with id: ' + res_id)) {
+            $.ajax({
+               method : "GET",
+               url : "/personnel/allow_reservation/"+res_id,
+               success: function(data, textStatus, jqXHR) {
+                   var allowed_table = $('#confirmed-reservations').DataTable();
+                   var data_table = $('#reservations').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        allowed_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Registration successfully confirmed.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    }
+</script>
+{% endblock %}
+{% block base_ajax_post %}
+
+{% endblock %}

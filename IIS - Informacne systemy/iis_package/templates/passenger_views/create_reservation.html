@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Reservation{% endblock %}
+
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+
+<form id="form-block" class="row mt-5 mx-2">
+    <div class="col-4">
+        <div id="reservation-form" class="row alert alert-primary">
+            <h2 class="mb-3">Reservation</h2>
+            <div class="form-floating mb-3">
+                {% if email %}
+                <input type="email" class="form-control form-control-lg" pattern=".+@.+\..+" id="email_input" name="email" value="{{email}}" readonly>
+                {% else %}
+                <input type="email" class="form-control form-control-lg" pattern=".+@.+\..+" id="email_input" name="email" onblur="check_email(this.value)">
+                {% endif %}
+                <label for="email_input" class="ms-2">E-mail address</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control form-control-lg" id="enter_stop_input" name="enter_stop" value="{{enter_stop}}" readonly>
+                <label for="enter_stop_input" class="ms-2">Starting stop</label>
+            </div>
+            <div class="form-floating">
+                <input type="text" class="form-control form-control-lg" id="exit_stop_input" name="exit_stop" value="{{exit_stop}}" readonly>
+                <label for="exit_stop_input" class="ms-2">Exit stop</label>
+            </div>
+            <div class="m-3 form-check">
+                <input class="form-check-input" type="checkbox" value="" id="confirmation_check" name="confirmation_check">
+                <label class="ms-2 me-2 form-check-label" for="confirmation_check">
+                    I agree to the Terms and Conditions of Operation and Use of the FIT traffic Transport Portal
+                </label>
+            </div>
+            <div class="m-3 form-check">
+                <input class="form-check-input" type="checkbox" value="" id="gdpr_confirmation" name="gdpr_confirmation">
+                <label class="ms-2 me-2 form-check-label" for="gdpr_confirmation">
+                    I confirm that I have familiarised myself with the terms and conditions of Personal Data Protection
+                </label>
+            </div>
+            <div class="mt-4">
+                <button type="button" onclick="make_reservation();" class="btn btn-primary text-center w-100 btn-lg">
+                    Confirm reservation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4">
+        <div class="form-floating mb-2">
+            <select id='select-wagon' class="form-select" onchange="select_wagon(this);"></select>
+            <label for='select-wagon'>
+                Select {{'Wagon' if vehicle_type == 'train' else 'Floor'}}
+            </label>
+        </div>
+        <div id="vehicle" class=" border"></div>
+        <ul id="wagon-tab" class="d-none nav nav-tabs"></ul>
+    </div>
+
+    <div class="col-4" style="height:75vh;overflow-y:auto;scrollbar-width:thin;" id="reserved-seats"></div>
+    <!-- value holder for date -->
+    <input type="hidden" id="date-value" value="{{date}}" name="date-value"/>
+</form>
+
+
+<script>
+
+$(document).ready(function() {
+        
+    /// create seat forms
+    render_vehicle_seats('{{vehicle_type}}', '{{first_cls_cap}}', '{{second_cls_cap}}', '{{f_cls_car}}', '{{s_cls_car}}', '{{f_cls_taken}}', '{{s_cls_taken}}');
+
+    /// init wagon select values
+    for (var i = 0; i < '{{f_cls_car}}'; ++i) {
+        $('#select-wagon').append($('<option>', {
+            value : ('tab-item-first_class_wagon_' + i),
+            text : "First class, " + ('{{vehicle_type}}' == 'train' ? "Wagon: " : "Floor: ") + i
+            }));
+    }
+    for (var i = 0; i < '{{s_cls_car}}'; ++i) {
+        $('#select-wagon').append($('<option>', {
+            value : ('tab-item-second_class_wagon_' + i),
+            text : "Second class, " + ('{{vehicle_type}}' == 'train' ? "Wagon: " : "Floor: ") + i
+            }));
+    }
+
+    $('div.tab-pane').each(function(index, el) {
+        /// init wagon tabs
+        $('#wagon-tab').append($('<li>').append($('<button>', {
+            class : 'nav-link',
+            id : ('tab-item-' + el.id),
+            'data-bs-toggle' : 'tab',
+            'data-bs-target' : ('#' + el.id),
+            text : el.id
+        })));
+    });
+
+    /// init bootstrap tab objects
+    $('#wagon-tab li button').each(function(i, elem) {
+        new bootstrap.Tab(elem);
+    });
+
+    /// select first wagon
+    select_wagon(document.getElementById('select-wagon'));
+});
+
+function select_wagon(select) {
+    var tab = bootstrap.Tab.getInstance(document.getElementById(select.value));
+    if (tab)
+        tab.show();
+}
+
+function create_seat(seat, cls, taken) {
+    return '<div class="col-2"><input type="checkbox"'+ (taken ? ' disabled' : '') + (taken ? ' checked' : '') + ' class="btn-check" id="'+cls+'_seat_'+seat+'" autocomplete="off" onchange="toggle_seat(this, \''+cls+'\', '+seat+');">'+
+        '<label class="btn btn-outline-'+(taken ? 'danger' : cls == 'first' ? 'warning' : 'success')+' mx-3" style="min-width:72px;" for="'+cls+'_seat_'+seat+'">P' + seat+'</label></div>';
+}
+
+function render_vehicle_seats(vehicle_type, f_cls_cap, s_cls_cap, f_cls_car, s_cls_car, f_cls_taken, s_cls_taken) {
+    f_cls_taken = f_cls_taken.split(',').map(function(item) {
+        return parseInt(item, 10);
+    });
+
+    s_cls_taken = s_cls_taken.split(',').map(function(item) {
+        return parseInt(item, 10);
+    });
+    var html = '';
+    var length = (vehicle_type == 'train' ? 10 : 15);
+
+    html += '<div class="tab-content">';
+    [['first',f_cls_cap, f_cls_car, f_cls_taken], ['second', s_cls_cap, s_cls_car, s_cls_taken]].forEach(function(cls) {
+        var seat = 0;
+        for (var wagon = 0; wagon < cls[2]; ++wagon) {
+            html += '<div class="tab-pane fade" id="'+cls[0]+'_class_wagon_' + wagon +'" role="tabpanel">';
+            html += '<h3 class="text-center">'+ (vehicle_type == 'train' ? 'Wagon ' : 'Floor ')+wagon+'</h3>';
+            for (var y = 0; y < length; ++y) {
+                html += '<div class="row mb-1">';
+                for (var x = 0; x < 4; ++x) {
+                    if (x == 0) html += '<div class="col-1"></div>';
+                    html += create_seat((++seat), cls[0], cls[3].includes(seat) || seat >= cls[1]);
+                    if (x == 1) html += '<div class="col-1"></div>';
+                }
+                html += '</div>';
+                if (y % 2 == 1) html += '<div class="mb-3"></div>';
+            }
+            html += '</div>';
+        }
+    })
+    html += '</div>';
+    $('#vehicle').html(html);
+}    
+
+function toggle_seat(trigger, cls, seat) {
+    var parent = $('#reserved-seats');
+
+    /// add seat to list
+    if (trigger.checked) {
+        var html = 
+            '<div class="row mb-2 alert alert-secondary position-relative" id="seat-'+cls+'-'+seat+'">' +
+                '<input class="reservation-class" name="class" type="hidden" value="'+(cls=='first' ? 0 : 1)+'"/>' +
+                '<input class="reservation-seat" name="seat" type="hidden" value="'+seat+'"/>' +
+                
+                '<h4>&lt;' + cls.toUpperCase() +' CLASS&gt; <code>seat: '+ seat +'</code></h4>' +
+                '<button type="button" onclick="remove_seat(\'seat-'+cls+'-'+seat+'\', \''+cls+'_seat_'+seat+'\');" class="bnt-lg btn-close position-absolute top-0 end-0 me-1 mt-1"></button>' +
+                
+                '<select class="form-select" name="tarif">' +
+                    '<option style="fst-italic" selected="selected" value="-1">&lt;Choose tarif&gt;</option>' +
+                    '<option value="0">Kid</option>' +
+                    '<option value="1">Student</option>' +
+                    '<option value="2">Invalid</option>' +
+                    '<option value="3">Base</option>' +
+                '</select>' +
+            '</div>';
+        parent.append(html);
+    /// remove 
+    } else {
+        $('#seat-' + cls + '-' + seat).remove();
+    }
+}
+
+function remove_seat(group, checkbox) {
+    $('#' + group).remove();
+    document.getElementById(checkbox).checked = false;
+}
+
+function make_reservation() {
+    $.ajax({
+        method : "POST",
+        url : "/passenger/create_reservation/{{connection}}",
+        data : $('#form-block').serialize(),
+        success : function(data) {
+            if (!data.success) {
+                bs_alert('alert-wrapper', data.msg, data.type);
+            } else  {
+                window.location.href = "/search_reservations?email="+data.email;
+            }
+        }
+    });
+}
+
+function check_email(email) {
+    $.ajax({
+       method : "GET",
+       url : "/passenger/check_email?email="+email,
+       success : function(data) {
+           if (!data.success) {
+               bs_alert('alert-wrapper', data.msg, data.type);
+           } 
+       } 
+    });
+}
+
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+
+</script>
+{% endblock %}

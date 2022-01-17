@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% from 'components/table.html' import table %}
+
+{% block title %}Connections{% endblock %}
+
+{% block flash_messages %}
+
+<div id="alert-wrapper"></div>
+
+{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}">
+    function bs_alert(wrapper, message, category) {
+        $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+    } 
+</script>   
+{% endblock %}
+
+{% block body_content %}
+<div class="container mt-5">
+    {{ table('connection-table', 'table table-hover') }}
+    <div class="d-flex justify-content-end mt-3">
+        <a class="btn btn-primary" href="/operator/manage_connections">Design new connection</a>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#connection-table').DataTable({
+            "ajax" : "/operator/list_connections",
+            "columns" : [
+                { data : "id",        title : "Id" },
+                { data : "link_name", title : "Name" },
+                { data : "interval",  title : "Interval", visible : false },
+                { defaultContent : "", title : 'Interval', 
+                  render : function( data, type, row, meta ) {
+                        var days = [ 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+                        var val = ''
+                        for (var i = 0; i < 8; ++i) {
+                            val += ((row.interval >> i) & 1) ? days[i] + ', ' : '';
+                        }
+                        return val!="" ? val.substr(0, val.length-2) : '';
+                  }},
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta) {
+                    return "<a href='/operator/manage_connections/"+row.id+"' class='btn btn-primary btn-sm'>Edit link</a> <button type='button' onclick='delete_connection(\""+row.id+"\");' class='btn btn-danger btn-sm'>Delete link</button>";
+                  }
+                }
+            ]
+        });
+    });
+
+    function delete_connection(connection_id) {
+        if (confirm('Do you really want to delete connection: ' + connection_id)) {
+            $.ajax({
+               method : "GET",
+               url : "/operator/delete_connection/"+connection_id,
+               success: function(data, textStatus, jqXHR) {
+                   var data_table = $('#connection-table').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Link succesfully removed.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                   }
+               } 
+            });
+        }
+    }
+</script>
+{% endblock %}
+

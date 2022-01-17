@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Reservations{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+<!-- overriden default flash message block to display message without page reload -->
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+
+<div class="container mt-5">
+    <h3> Unconfirmed reservations {{email}}</h3>
+    <table id="reservations" class="table table-hover">
+        <caption>
+            Unconfirmed reservations, Legend: tarifs [I = Invalid, B = Base, S = Student, K = Kid], classes [1st = 1st class, 2nd = 2nd class]
+        </caption>
+    </table>
+</div>
+
+
+<div class="container mt-5">
+    <h3> Cancelled reservations {{email}}</h3>
+    <table id="denied-reservations" class="table table-hover">
+        <caption>
+            Cancelled reservation info, Legend: tarifs [I = Invalid, B = Base, S = Student, K = Kid], classes [1st = 1st class, 2nd = 2nd class]
+        </caption>
+    </table>
+</div>
+
+<div class="container mt-5">
+    <h3> Confirmed reservations {{email}}</h3>
+    <table id="confirmed-reservations" class="table table-hover">
+        <caption>
+            Confirmed reservation info, Legend: tarifs [I = Invalid, B = Base, S = Student, K = Kid], classes [1st = 1st class, 2nd = 2nd class]
+        </caption>
+    </table>
+</div>
+
+<script>
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#reservations').DataTable( {
+            "ajax"    : "/load_unconfirmed?email=" + encodeURIComponent('{{email}}'),
+            "columns" : [
+                { "defaultContent": "",data : "datetime",   title : "Date" },
+                { "defaultContent": "",data : "enter_stop",   title : "Enter stop" },
+                { "defaultContent": "",data : "exit_stop",   title : "Exit stop" },
+                { "defaultContent": "",data : "seats",   title : "Seats" },
+                { "defaultContent": "",data : "seat_positions",   title : "Positions" },
+                { "defaultContent": "",data : "link_name", title : "Link name"},
+                { "defaultContent": "",data : "location", title : "Location"},
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "<button type='button' onclick='cancelReservation(\""+row.id+"\");' class='btn btn-outline-danger'>Cancel</button>";
+                  }
+                },
+            ]
+        });   
+
+    $('#denied-reservations').DataTable( {
+            "ajax"    : "/load_denied?email=" + encodeURIComponent('{{email}}'),
+            "columns" : [
+                { "defaultContent": "",data : "datetime",   title : "Date" },
+                { "defaultContent": "",data : "enter_stop",   title : "Enter stop" },
+                { "defaultContent": "",data : "exit_stop",   title : "Exit stop" },
+                { "defaultContent": "",data : "seats",   title : "Seats" },
+                { "defaultContent": "",data : "seat_positions",   title : "Positions" },
+                { "defaultContent": "",data : "link_name", title : "Link name"},
+                { "defaultContent": "",data : "location", title : "Location"}
+            ]
+        });   
+
+    $('#confirmed-reservations').DataTable( {
+            "ajax"    : "/load_allowed?email=" + encodeURIComponent('{{email}}'),
+            "columns" : [
+                { "defaultContent": "",data : "datetime",   title : "Date" },
+                { "defaultContent": "",data : "enter_stop",   title : "Enter stop" },
+                { "defaultContent": "",data : "exit_stop",   title : "Exit stop" },
+                { "defaultContent": "",data : "seats",   title : "Seats" },
+                { "defaultContent": "",data : "seat_positions",   title : "Positions" },
+                { "defaultContent": "",data : "link_name", title : "Link name"},
+                { "defaultContent": "",data : "location", title : "Location"}
+            ]
+        });   
+    }); 
+
+    function cancelReservation(reservation_id) {
+        if (confirm('Do you really want to cancel reservation with id: ' + reservation_id)) {
+            $.ajax({
+               method : "GET",
+               url : "/cancel_reservation?id="+reservation_id,
+               success: function(data, textStatus, jqXHR) {
+                   var data_table = $('#reservations').DataTable();
+                   var data_table_canceled = $('#denied-reservations').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        data_table_canceled.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Reservation successfully canceled.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    }
+
+</script>
+{% endblock %}
+{% block base_ajax_post %}
+
+{% endblock %}

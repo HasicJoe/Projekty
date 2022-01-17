@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block title %}Design Stops{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+<!-- overriden default flash message block to display message without page reload -->
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+<div class="modal fade" id="edit-stop" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" id="edit" method="POST">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit stop</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="error-edit-alert" class="alert alert-success alert-dismissible fade" role="alert">
+                    <span></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="edit-name" name="edit-name" readonly>
+                    <label for="text-edit-address">Stop name</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="edit-address" name="edit-address" readonly>
+                    <label for="text-edit-address">Current address</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="edit-new-address" name="edit-new-address" required>
+                    <label for="edit-new-address">New address</label>
+                </div>
+                <div class="form-floating mb-3">
+                     <button type="submit" class="btn btn-outline-dark btn-lg btn-block" id="modal-calculate">Calculate Coordinates</button> 
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="edit-latitude" name="edit-latitude" required readonly>
+                    <label for="edit-latitude">New Latitude</label>
+                </div>
+                 <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="edit-longitude" name="edit-longitude" required readonly>
+                    <label for="edit-longitude">New Longitude</label>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-description" class="form-label">Description</label>
+                    <textarea class="form-control" id="edit-description" name="edit-description" rows="3" required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal"  id="savechanges" disabled>Save changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<form method="POST" class="w-50 mx-auto" id="basic">
+    <h4 class="text-center mb-4 mt-4" id="test">Design new stop</h4>
+    <div class="form-floating mb-2">
+        <input type="text" class="form-control" name="name"  id="name" required/>
+        <label for="name">Stop name</label>
+    </div>
+     <div class="form-floating mb-2">
+        <input type="text" class="form-control" name="address"  id="address" required/>
+        <label for="address">Stop address</label>
+    </div>
+    <div class="form-floating mb-2 d-flex justify-content-center">
+         <button type="submit" class="btn btn-outline-dark btn-lg btn-block" id="calculate">Calculate Coordinates</button> 
+    </div>
+    <div class="form-floating mb-2">
+        <input type="number" class="form-control" name="latitude"  id="latitude" required readonly/>
+        <label for="latitude">Latitude</label>
+    </div>
+    <div class="form-floating mb-2">
+        <input type="number" class="form-control" name="longitude"  id="longitude" required readonly/>
+        <label for="longitude">Longitude</label>
+    </div>
+    <div class="form-floating mb-2">
+        Description
+       <textarea class="form-control" id="description" name="description" rows="3" placeholder="Stop description" required></textarea>
+    </div>
+    <br/>
+    <div class="d-flex justify-content-center" id="output"></div>
+    <br>
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-outline-success btn-lg" id="save" disabled>Save stop</button>
+    </div>
+</form>
+
+<div class="container mt-5">
+    <h4>Waiting for approval</h4>
+    <table id="waiting-stops" class="table table-hover">
+    </table>
+</div>
+
+<div class="container mt-5">
+    <h4>Active Stops</h4>
+    <table id="active-stops" class="table table-hover">
+    </table>
+</div>
+
+<div class="container mt-5">
+    <h4>Request to edit</h4>
+    <table id="edit-stops" class="table table-hover">
+    </table>
+</div>
+
+<div class="container mt-5">
+    <h4>Reqest to delete</h4>
+    <table id="delete-stops" class="table table-hover">
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+      //  new bootstrap.Modal(document.getElementById('edit-vehicles'));
+        $('#waiting-stops').DataTable( {
+            "ajax"  : { type: 'POST', url: "/operator/get_stops", data: { status : 0 } },
+            "columns" : [
+                { data : "name",  title : "Name" },
+                { data : "address",  title : "Address" },
+                { data : "latitude",   title : "Latitude" },
+                { data : "longitude",    title : "Longitude" },
+                { data : "description",    title : "Description" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "";
+                  }
+                },
+            ]
+        });
+         $('#active-stops').DataTable( {
+            "ajax"  : { type: 'POST', url: "/operator/get_stops", data: { status : 1 } },
+            "columns" : [
+                { data : "name",  title : "Name" },
+                { data : "address",  title : "Address" },
+                { data : "latitude",   title : "Latitude" },
+                { data : "longitude",    title : "Longitude" },
+                { data : "description",    title : "Description" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "<button type='button' class='btn btn-outline-primary' data-bs-toggle='modal'\
+                        data-bs-target='#edit-stop'\
+                        data-bs-name='"+row.name+"'\
+                        data-bs-address='"+row.address+"'\
+                        data-bs-latitude='"+row.latitude+"'\
+                        data-bs-longitude='"+row.longitude+"'\
+                        data-bs-description='"+row.description+"'>Request to edit</button>\
+                        <button type='button' onclick='requestDeleteStop(\""+row.name+"\");' class='btn btn-outline-danger'>Request to delete</button>";
+                  }
+                },
+            ]
+        });
+         $('#delete-stops').DataTable({
+            "ajax"  : { type: 'POST', url: "/operator/get_stops", data: { status : 3 } },
+            "columns" : [
+                { data : "name",  title : "Name" },
+                { data : "address",  title : "Address" },
+                { data : "latitude",   title : "Latitude" },
+                { data : "longitude",    title : "Longitude" },
+                { data : "description",    title : "Description" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "";
+                  }
+                },
+            ]
+        });
+         $('#edit-stops').DataTable( {
+            "ajax"  : { type: 'POST', url: "/operator/get_stops", data: { status : 2 } },
+            "columns" : [
+                { data : "name",  title : "Name" },
+                { data : "address",  title : "Address" },
+                { data : "latitude",   title : "Latitude" },
+                { data : "longitude",    title : "Longitude" },
+                { data : "description",    title : "Description" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta ) {
+                    return "";
+                  }
+                },
+            ]
+        });
+       
+        var editModal = document.getElementById('edit-stop')
+        editModal.addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        var button = event.relatedTarget;
+        // Update the modal's content. (Load user data)
+        document.getElementById('edit-name').value =       button.getAttribute('data-bs-name');
+        document.getElementById('edit-address').value =       button.getAttribute('data-bs-address');
+        document.getElementById('edit-latitude').value =      button.getAttribute('data-bs-latitude');
+        document.getElementById('edit-longitude').value =      button.getAttribute('data-bs-longitude');
+        document.getElementById('edit-description').value =   button.getAttribute('data-bs-description');
+        });     
+    });
+
+    function requestDeleteStop(name) {
+        if (confirm('Do you really want to request that the following stop wil be deleted? : ' + name)) {
+            $.ajax({
+               method : "POST",
+               url : "/operator/request_delete_stop?name="+name,
+               data : name,
+               success: function(data, textStatus, jqXHR) {
+                   var data_table = $('#delete-stops').DataTable();
+                   switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Delete request successfuly created.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Internal error.');
+                    break;
+                   }
+               } 
+            });
+        }
+    } 
+</script>
+
+{% endblock %}
+{% block base_ajax_post %}
+
+<script type="text/javascript">
+    $('form#edit').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/operator/create_edit_request",
+            data: $('form').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                var data_table = $('#active-stops').DataTable();
+                var edit_data_table = $('#edit-stops').DataTable();
+                var modal_window = bootstrap.Modal.getInstance(document.getElementById('edit-stop'));
+                switch(jqXHR.status) {
+                    case 200:
+                        data_table.ajax.reload();
+                        edit_data_table.ajax.reload();
+                        document.getElementById('edit-new-name').value = "";
+                        document.getElementById('edit-new-address').value = "";
+                        document.getElementById('edit-latitude').value = ""; 
+                        document.getElementById('edit-longitude').value = ""; 
+                        document.getElementById('edit-description').value = "";
+                        modal_window.hide();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Request successfully created.</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Missing fields.');
+                    break;
+                    case 211:
+                        alert('Requested stop address already exists.');
+                    break;
+                }
+            },
+        });
+    });
+     $('button#calculate').click(function(event) {
+       event.preventDefault();
+       $.ajax({
+            data: $('form#basic').serialize(),
+            type : 'POST',
+            url : '/operator/calculate_coordinates',
+            cache: false,
+            success: function(data) {
+                $('#output').empty();
+                $('#output').prepend($('<img>',{id: 'map', src: data.map}));
+                $('input#latitude').val(data.latitude);
+                $('input#longitude').val(data.longitude);
+                $('button#save').removeAttr('disabled');
+            }
+        });
+      });
+
+       $('button#modal-calculate').click(function(event) {
+       event.preventDefault();
+       var address = $('input#edit-new-address').val();
+       $.ajax({
+            data: {'address' : address},
+            type : 'POST',
+            url : '/operator/calculate_coordinates',
+            cache: false,
+            success: function(data) {
+                $('input#edit-latitude').val(data.latitude);
+                $('input#edit-longitude').val(data.longitude);
+                $('button#savechanges').removeAttr('disabled');
+            }
+        });
+      });
+
+      $('button#save').click(function(event) {
+       event.preventDefault();
+       $.ajax({
+            data: $('form#basic').serialize(),
+            type : 'POST',
+            url : '/operator/save_stop',
+            cache: false,
+            success: function(data, textStatus, jqXHR) {
+                var waiting_table = $('#waiting-stops').DataTable();
+                var active_table = $('#active-stops').DataTable();
+                var edit_table = $('#edi-stops').DataTable();
+                var delete_table = $('#delete-stops').DataTable();
+                switch(jqXHR.status) {
+                    case 200:
+                        $('button#save').attr("disabled",true);
+                        $('input#address').val('');
+                        $('input#latitude').val('');
+                        $('input#longitude').val('');
+                        $('textarea#description').val('');
+                        waiting_table.ajax.reload();
+                        active_table.ajax.reload();
+                        edit_table.ajax.reload();
+                        delete_table.ajax.reload();
+                        $('#alert-wrapper').html('<div id=\"success-edit-alert\" \
+                        class=\"alert alert-success alert-dismissible fade show\" role=\"alert\">\
+                        <span>Stop successfully added</span>\
+                        <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button></div>');
+                    break;
+                    default:
+                    case 210:    
+                        alert('Same stop already exists.');
+                    break;
+                    case 211:
+                        alert('Missing fields.');
+                    break;
+                }
+            }
+        });
+      });
+</script>
+{% endblock %}

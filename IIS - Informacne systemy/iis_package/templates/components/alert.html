@@ -1,0 +1,25 @@
+{# 
+    bootstrap 5 alert component 
+    @message - message to display to user 
+    @category - bootstrap coloring category, can be {primary, secondary, success, warning, danger, info, dark, light} 
+    alert_inline is packed to one line, so it can be used, as a HTML string 
+ 
+    usage in jQuery - $('#alert-wrapper').html("{{ alert('User successfully edited', 'success')}}");
+#}
+{% macro alert(message, category) -%}
+<div class='alert alert-{{category}} alert-dismissible fade show' role='alert'>
+    {{ message }}
+    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+</div>
+{% endmacro %}
+
+{% macro alert_inline(message, category) -%}<div class='alert alert-{{category}} alert-dismissible fade show' role='alert'>{{ message }}<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>{% endmacro %}
+
+{#
+    add jQuery script to
+    dynamically add alert to page
+    @wrapper_id - id of wrapping div element    
+#}
+{% macro add_alert(wrapper_id, message, category)-%} $('#{{wrapper_id}}').html("{{alert_inline(message, category)}}"); {% endmacro %}
+
+{% macro alert_inline_caller(category) -%}<div class='alert alert-{{category}} alert-dismissible fade show' role='alert'>{{ caller() }}<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>{% endmacro %}

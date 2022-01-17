@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Check availability{% endblock %}
+
+{% block body_content %}
+
+<form class="row mx-auto mt-5 alert alert-primary pe-0" style="width:40%">
+    <h2 class="mb-3">Check availability</h2>
+    <div class="form-floating">
+        <input type="text" class="form-control form-control-lg" id="floatingInput" placeholder=" ">
+        <label for="floatingInput">Link</label>
+    </div>
+    <div class="row">
+        <button type="button" class="btn btn-primary h-100" role="button">Check</button>
+    </div>
+</form>
+
+{% endblock %}

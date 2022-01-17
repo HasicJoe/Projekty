@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% from 'components/table.html' import table %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+{% block title %}Manage connections{% endblock %}
+
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+
+<ul class="nav nav-tabs mt-3" id="tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active disabled" id="basic-info-tab" data-bs-toggle="tab" data-bs-target="#basic-info" 
+      type="button" role="tab" disabled>Basic information</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link disabled" id="interval-tab" data-bs-toggle="tab" data-bs-target="#interval" 
+        type="button" role="tab" disabled>Day interval</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link disabled" id="vehicle-tab" data-bs-toggle="tab" data-bs-target="#vehicle" 
+        type="button" role="tab" disabled>Vehicle</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link disabled" id="routes-tab" data-bs-toggle="tab" data-bs-target="#routes" 
+      type="button" role="tab" >Routes</button>
+    </li>
+
+</ul>
+    
+<form class="tab-content mt-3" id="tab-content" method="POST">
+    <div id="basic-info" class="tab-pane fade show active" role="tabpanel">
+        <div class="bg-light bg-gradient me-1 py-3">
+            <div class="col-3 mx-auto">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="text-connection-name" name="text-connection-name" value="{{connection_name}}">
+                    <label for="text-connection-name">Connection name<span style="color:red;">*</span></label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="text-operator-name" name="text-operator-name" readonly value="{{operator_name}}">
+                    <label for="text-operator-name">Operator name</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="interval" class="tab-pane fade">
+        <div class="col-2 alert alert-primary mx-auto">
+            <h4>Connection interval<span style="color:red;">*</span></h4>
+            <hr/>
+            {% set day_list = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] -%}
+            {% for day in day_list -%}
+            <div class="form-check mt-3">
+                <label class="form-check-label" for="checkbox-{{ day }}">
+                    {% if interval and interval[day_list.index(day)] %}
+                    <input class="form-check-input" type="checkbox" checked id="checkbox-{{ day }}" name="checkbox-{{ day }}">
+                    {% else %}
+                    <input class="form-check-input" type="checkbox" id="checkbox-{{ day }}" name="checkbox-{{ day }}">
+                    {% endif %}
+                    {{ day.capitalize() }}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="vehicle" class="tab-pane fade">
+        <div class="row">
+
+            <div class="col-8 pt-3 pb-3">
+                <h4>Choose vehicle</h4>
+                <hr/>
+                {{ table("vehicle-table", "table table-hover") }}
+            </div>
+        
+        <div class="offset-1 col-2 alert alert-primary">
+            <div class=" me-1">
+                <h4>Selected vehicle<span style="color:red;">*</span></h4>
+                <hr/>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="text-vehicle-license-plate" name="text-vehicle-license-plate" readonly value="{{ license_plate }}">
+                    <label for="text-vehicle-license-plate">License plate</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="text-vehicle-capacity-first" name="text-vehicle-capacity-first" readonly value="{{ capacity }}">
+                    <label for="ttext-vehicle-capacity-first">First class capacity</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="text-vehicle-capacity-second" name="text-vehicle-capacity-second" readonly value="{{ capacity }}">
+                    <label for="text-vehicle-capacity-second">Second class capacity</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div id="routes" class="tab-pane fade">
+        <div class="row">
+
+            <div class="col-6 mt-3">
+                <h4>Choose stops</h4>
+                <hr/>
+                {{ table("stops-table", "table table-hover w-100") }}
+            </div>
+            
+            <div class="col-5 mt-3">
+                <h4>Planned route <i style="font-size: 12px;" class="text-danger">(routes will be ordered in &quot;arrival time&quot; ascending order)</i></h4>
+                <hr/>
+                <div class="d-flex mb-2">
+                    <div style="width: 49%;">Stop name</div>
+                    <div class="col-2">Arrival<span style="color:red">*</span></div>
+                    <div class="col-2">Departure</div>
+                </div>
+
+                <div id="planned-stops" class="pe-1" style="height:530px;overflow-y:auto;">
+                    {% if routes %}
+                    {% for i, stop_name, arrival_time, departure_time in routes %}
+                    <div class='input-group mb-2'>
+                        <input type='text' name='stop-name-{{i}}' id='stop-name-{{i}}' class='form-control' style='width: 33%;' readonly value='{{stop_name}}'>
+                        <input type='time' name='stop-arrival-{{i}}' id='stop-arrival-{{i}}' class='form-control' value='{{arrival_time}}'>
+                        <input type='time' name='stop-departure-"{{i}}' id='stop-departure-{{i}}' class='form-control' value='{{departure_time}}'>
+
+                        <button type='button' class='btn btn-outline-primary' onclick='moveStopUp(this);'><span class='fw-bold bi-arrow-up'></span></button>
+                        <button type='button' class='btn btn-outline-primary' onclick='moveStopDown(this);'><span class='fw-bold bi-arrow-down'></span></button>
+                        <button type='button' class='btn btn-outline-danger' onclick='removeStop(this);'><span class='bi-x-lg'></span></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="preview" class="tab-pane fade">
+
+    </div>
+</form>
+
+<div id='control-button-group' class="fixed-bottom text-center bg-light pt-2">
+    <button class="btn btn-lg btn-outline-success ms-auto px-5 ms-5 mb-2" onclick="showPrevTab(this);">Prev</button>
+    <button class="btn btn-lg btn-outline-success px-5 ms-5 mb-2" onclick="showNextTab(this);">Next</button>
+    <button id="propose-changes-button" class="btn btn-lg btn-outline-primary ms-5 mb-2 disabled" onclick="$('form.tab-content').submit();" disabled>Propose changes</button>
+</div>
+
+
+
+<script>
+
+    $(document).ready(function() {
+        $('form.tab-content').on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                method : "POST",
+                data: $('form.tab-content').serialize(),
+                url : "{% if connection_id %}/operator/manage_connections/{{ connection_id}}{% else %}/operator/manage_connections{% endif %}",
+                
+                success : function(data) {
+                    bs_alert('alert-wrapper', data.msg, data.type);
+                    if (data.status == 'success') {
+                        setTimeout(function() {
+                            window.location.href = "/operator/connections";
+                        }, 1000);
+                    } else {
+                        if (data.tab_id) {
+                            var tab = bootstrap.Tab.getInstance(document.getElementById(data.tab_id));
+                            if (tab) {
+                                tab.show();
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        var vehicle_table = $('#vehicle-table').DataTable( {
+            "ajax"    : "/operator/manage_vehicles2json",
+            "scrollY" : 185,
+            "columns" : [
+            { data : "license_plate",   title : "License_plate" },
+            { data : "first_class_capacity",        title : "First class capacity" },
+            { data : "second_class_capacity",        title : "Second class capacity" },
+            { data : "description",     title : "Description" },
+            { defaultContent : "", orderable : false,
+              render : function ( data, type, row, meta ) {
+                return "<button class='btn btn-outline-primary btn-sm' type='button'\
+                 data-license-plate='"+row.license_plate+"'\
+                 data-first-capacity='"+row.first_class_capacity+"'\
+                 data-second-capacity='"+row.second_class_capacity+"'\
+                 onclick='selectVehicle(this);'>Select</button>";
+              }
+            }]
+        });
+
+        vehicle_table.columns.adjust().draw();
+
+        $('#stops-table').DataTable({
+            "ajax" : "/operator/stops_data?status=1",
+            "scrollY" : "49vh",
+            "columns" : [
+                { data : "name",        title : "Name" },
+                { data : "latitude",    title : "Latitude" },
+                { data : "longitude",   title : "Longitude" },
+                { data : "description", title : "Description" },
+                { defaultContent : "", orderable : false,
+                  render : function ( data, type, row, meta) {
+                    return "<button class='btn btn-outline-primary btn-sm' type='button'\
+                    data-stop-name='"+row.name+"'\
+                    onclick='addStop(this);'>Add</button>";
+                  }
+            }]
+        });
+
+        /// reset all form values do default -> init form
+        document.getElementById('tab-content').reset();
+
+        /// init bootstrap tabs
+        var triggerTabList = [].slice.call(document.querySelectorAll('ul.nav button.nav-link'));
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl);
+        });
+
+
+        $('#routes-tab').on('shown.bs.tab', function(event) {
+            var btn = $('#propose-changes-button');
+            btn.prop('disabled', false);
+            btn.removeClass('disabled');
+        });
+
+        $('#routes-tab').on('hidden.bs.tab', function(event) {
+            var btn = $('#propose-changes-button');
+            btn.prop('disabled', true);
+            btn.addClass('disabled');
+        });
+    });
+
+function showNextTab(btn) {
+    var sibling =   $('button.nav-link.active').parent().next();
+    if (sibling.is('li.nav-item')) 
+        bootstrap.Tab.getInstance(sibling.children()[0]).show();
+}
+
+function showPrevTab(btn) {
+    var sibling = $('button.nav-link.active').parent().prev();
+    if (sibling.is('li.nav-item')) 
+        bootstrap.Tab.getInstance(sibling.children()[0]).show();
+}
+
+function selectVehicle(btn) {
+    $('#text-vehicle-license-plate').val($(btn).attr('data-license-plate'));
+    $('#text-vehicle-capacity-first').val($(btn).attr('data-first-capacity'));
+    $('#text-vehicle-capacity-second').val($(btn).attr('data-second-capacity'));
+}
+
+function addStop(btn) {
+    
+    var stop_name = $(btn).attr('data-stop-name');
+    var parent = $('#planned-stops');
+    var index = parent.children().length;
+
+    /// dynamically add planned route group
+    parent.append("\
+        <div class='input-group mb-2'>\
+            <input type='text' name='stop-name-"+index+"' id='stop-name-"+index+"'\
+             class='form-control' style='width: 33%;' readonly value='"+stop_name+"'>\
+            <input type='time' name='stop-arrival-"+index+"' id='stop-arrival-"+index+"' class='form-control'>\
+            <input type='time' name='stop-departure-"+index+"' id='stop-departure-"+index+"' class='form-control'>\
+            <button type='button' class='btn btn-outline-primary' onclick='moveStopUp(this);'>\
+                <span class='fw-bold bi-arrow-up'></span>\
+            </button>\
+            <button type='button' class='btn btn-outline-primary' onclick='moveStopDown(this);'>\
+                <span class='fw-bold bi-arrow-down'></span>\
+            </button>\
+            <button type='button' class='btn btn-outline-danger' onclick='removeStop(this);'>\
+                <span class='bi-x-lg'></span>\
+            </button>\
+        </div>"
+    );
+}
+
+function moveStopUp(btn, step) {
+    var index = $(btn).parent().index();
+    if (index > 0) {
+        ['stop-name-', 'stop-arrival-', 'stop-departure-'].forEach(function(prefix) {
+            var temp = document.getElementById(prefix+(index-1)).value;
+            document.getElementById(prefix+(index-1)).value = document.getElementById(prefix+index).value;
+            document.getElementById(prefix+index).value = temp;
+        });
+    }
+}
+
+function moveStopDown(btn) {
+    var index = $(btn).parent().index();
+    if (index+1 < $(btn).parent().parent().children().length) {
+        ['stop-name-', 'stop-arrival-', 'stop-departure-'].forEach(function(prefix) {
+            var temp = document.getElementById(prefix+(index+1)).value;
+            document.getElementById(prefix+(index+1)).value = document.getElementById(prefix+index).value;
+            document.getElementById(prefix+index).value = temp;
+        });
+    }
+}
+
+function removeStop(btn) {
+    var index = $(btn).parent().index();
+    var parent = $('#planned-stops');
+    var length = parent.children().length;
+
+    for (var i = index; i < (length-1); ++i) {
+        ['stop-name-', 'stop-arrival-', 'stop-departure-'].forEach(function(prefix) {
+            document.getElementById(prefix+(i)).value = document.getElementById(prefix+(i+1)).value;
+        });
+    }
+    /// remove input group element
+    parent.children().last().remove();
+}
+
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+
+</script>
+    
+{% endblock %}

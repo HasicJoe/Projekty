@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    {% block title %} About {% endblock %}
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-2"/>
+    <style type="text/css">
+    	table { border-collapse: collapse; }
+    	td, th { border: 1px solid black; padding: 0.3em 0.5em; text-align: left; }
+    	dt { font-weight: bold; margin-top: 0.5em; }
+    </style>
+</head>
+{% block body_content %} 
+
+<!-- Zkontrolujte prosím nastavení kódování v hlavičce dokumentu 
+     podle použitého editoru -->
+
+<h1>Hromadná doprava: zadávání, vyhledávání spojů a rezervaci jízdenek</h1> <!-- Nahradte názvem svého zadání -->
+
+<dl>
+	<dt>Autoři</dt>
+	<dd><b>Samuel Valaštín</b> <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xvalas1001@stud.fit.vutbr.cz">xvalas10@stud.fit.vutbr.cz</a> -
+		autorizácia, správa privilégii, správa vozidiel, správa zastávok, modelovanie databázy, správa uživateľských účtov
+	</dd>
+	<dd><b>Daniel Gavenda</b> <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xgaven08@stud.fit.vutbr.cz">xgaven08@stud.fit.vutbr.cz</a> - 
+		modelovanie databázy, správa rezervácii, správa spojov, správa zmeny spojov, frontend templaty, správa uživateľov, kontrola polohy, vyhľadávanie spojov, rezervácie(backend)
+	</dd>
+  <dd><b>Adriana Jurkechová</b> <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xjurke02@stud.fit.vutbr.cz">xjurke02@stud.fit.vutbr.cz</a> - 
+		zobrazovanie spojov (frontend), dokumentácia, rezervácie (frontend)
+	</dd>
+	<dt>URL aplikace</dt>
+	<dd><a href="https://fittrafic.herokuapp.com/">https://fittrafic.herokuapp.com/</a></dd>
+</dl>
+
+<h2>Uživatelé systému pro testování</h2>
+<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
+<table>
+<tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
+<tr><td>administrator</td><td>administrator</td><td>Administrátor</td></tr>
+<tr><td>operator</td><td>operator</td><td>Dopravce</td></tr>
+<tr><td>personnel</td><td>personnel</td><td>Personál</td></tr>
+<tr><td>passenger</td><td>passenger</td><td>Cestujúci</td></tr>
+</table>
+
+<img src="{{ url_for('static', filename='usecase.png') }}" alt="Use case Diagram" style="margin-top:40px;"></img>
+
+<h2>Implementace</h2>
+<ul>
+	<li><b>iis_package/__init__.py</b> - Vytvorenie aplikácie, vytvorenie databázového spojenia</li>
+	<li><b>iis_package/administrator.py</b> - Logika pre administrátora</li>
+	<li><b>iis_package/auth.py</b> - Registrácia, prihlasovanie, odhlasovanie, generovanie navbaru</li>
+	<li><b>iis_package/generator.py</b> - Generovanie dát pre databázu</li>
+	<li><b>iis_package/models.py</b> - Databázové modely</li>
+	<li><b>iis_package/operator.py</b> - Logika pre dopravcu</li>
+	<li><b>iis_package/passenger.py</b> - Logika pre registrovaných pasažierov</li>
+	<li><b>iis_package/personnel.py</b> - Logika pre personál.</li>
+	<li><b>iis_package/views.py</b> - Logika dostupná pre všetkych uživateľov systému</li>
+	<li><b>iis_package/templates/*</b> - HTML a Javascript šablóny</li>
+	</ul>
+
+<h3>Databáze</h3>
+
+<img src="{{ url_for('static', filename='erd-final.png') }}" alt="ER Diagram"></img>
+<img src="{{ url_for('static', filename='schema.png') }}" alt="Schema" style="margin-top:40px;"></img>
+
+
+<h2>Instalace Linux</h2>
+
+<ul>
+<li><b>sudo apt install mysql-server</b></li>
+<li><b>sudo mysql_secure_installation</b></li>
+<li><b>sudo apt-get install python3-dev default-libmysqlclient-dev build-essential (Debian, Ubuntu)</b></li>
+<li><b>sudo yum install python3-devel mysql-devel (RHEL, Centos)</b></li>
+<li><b>pip install -r requirements.txt</b></li>
+<li><b>./run - skript pre lokálne spustenie aplikácie</b></li>
+<li><b>http://localhost:5000/gen_data - skript pre inicializáciu dát v db</b></li>
+</ul>
+Pre spustenie na platforme <b>Windows</b> treba použiť nasledujúce príkazy:
+
+<ul>
+<li>export FLASK_APP=main </li>
+<li>flask run </li>
+</ul>
+
+
+{% endblock %}

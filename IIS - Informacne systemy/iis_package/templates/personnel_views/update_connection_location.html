@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% from 'components/table.html' import table %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+{% block title %}Update connection location{% endblock %}
+
+<!-- overriden default flash message block to display message without page reload -->
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+
+<div class="row m-4">
+    <div class="col-4">{{ table("connection-info-table", "table table-hover", "Connection info") }}</div>
+    <div class="col-8" id="update-location-wrapper"></div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var connection_info_table = $('#connection-info-table').DataTable({
+        "ajax"    : "/personnel/get_current_connection_info",
+        "scrollY" : "550",
+        "columns" : [
+            { data : "link_name",    title : "Name" },
+            { data : "vehicle_id",   title : "Vehicle" },
+            { defaultContent : "", orderable : false,
+            render : function ( data, type, row, meta ) {
+                return "<button type='button' class='btn btn-success' onclick='choose_connection(\""+row.id+"\");'>Choose connection</button>";
+                }
+            },
+        ]
+    });
+});
+
+function choose_connection(connection_id) {
+    $.get({
+        url : "/personnel/get_connection_data/" + connection_id,
+        success : function(data) {
+            if (data.success) {
+                $('#update-location-wrapper').html(data.html_content);
+            } else {
+                bs_alert('alert-wrapper', data.msg, data.type);
+            }
+        }
+    });
+}
+
+function update_curr_location(old_index, connection_id) {
+    $.get({
+        url : "/personnel/update_curr_location/" + old_index + "/" + connection_id,
+        success : function (data) {
+            if (data.success) {
+                choose_connection(data.connection_id);
+            } else {
+                bs_alert('alert-wrapper', data.msg, data.type);
+            }
+        }
+    })
+}
+
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+</script>
+
+{% endblock %}

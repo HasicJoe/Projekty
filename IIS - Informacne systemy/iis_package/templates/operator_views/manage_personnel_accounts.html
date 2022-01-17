@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% from 'components/modal.html' import modal_window as modal %}
+{% from 'components/alert.html' import alert_inline, add_alert, alert_inline_caller %}
+{% from 'components/table.html' import table %}
+
+{% block title %}Manage personnel{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>    
+{% endblock %}
+
+<!-- overriden default flash message block to display message without page reload -->
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{% block body_content %}
+
+
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="offset-1 col-7">
+            {{ table("personnel-data-table", "table table-hover", "Personnel account info") }}
+        </div>
+        <form id="manage-personnel-form" class="col-3 alert alert-primary" method="POST">
+            <h3>Personnel account form</h3>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="text-id" name="text-id" readonly>
+                <label for="text-id">Personnel id (selected account)</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="text-login-name" name="text-login-name">
+                <label for="text-login-name">Login name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="text-password" name="text-password">
+                <label for="text-password">Password</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="text-password-confirm" name="text-password-confirm">
+                <label for="text-password-confirm">Password (confirm)</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="text-personnel-name" name="text-personnel-name">
+                <label for="text-personnel-name">Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="text-personnel-surname" name="text-personnel-surname">
+                <label for="text-personnel-surname">Surname</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="text-email" name="text-email" pattern=".+@.+\..+">
+                <label for="text-email">Email</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="tel" class="form-control" id="text-phone-number" name="text-phone-number" pattern="^[+]?[()/0-9. -]{9,}$">
+                <label for="text-phone-number">Phone</label>
+            </div>
+            <div class="row mx-1">
+                <button type="submit" class="col-4 btn btn-outline-success">Create or change</button>
+                <button type="button" onclick="deletePersonnel($('#text-id').val());" class="offset-1 col-3 btn btn-outline-danger">Delete</button>
+                <button type="button" onclick="deselectPersonnel();" class="offset-1 col-3 btn btn-outline-primary">Clear form</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+
+    /// clear edit form
+    deselectPersonnel();
+
+    $('#personnel-data-table').DataTable( {
+        "ajax"    : "/operator/manage_personnel_data",
+        "columns" : [
+            { data : "id",           title : "id" },
+            { data : "login_name",   title : "login" },
+            { data : "user_name",    title : "name" },
+            { data : "user_surname", title : "surname" },
+            { data : "email",        title : "email" },
+            { data : "phone_number", title : "phone" },
+            { defaultContent : "", orderable : false,
+            render : function ( data, type, row, meta ) {
+                return "<button type='button' class='btn btn-outline-primary'\
+                    onclick='selectPersonnel(this);'\
+                    data-bs-id='"+row.id+"'\
+                    data-bs-login-name='"+row.login_name+"'\
+                    data-bs-personnel-name='"+row.user_name+"'\
+                    data-bs-personnel-surname='"+row.user_surname+"'\
+                    data-bs-email='"+row.email+"'\
+                    data-bs-phone-number='"+row.phone_number+"'>Select</button>";
+                }
+            },
+        ]
+    });
+}); 
+
+function selectPersonnel(btn) {
+    $('#text-id').val(                  $(btn).attr('data-bs-id'));
+    $('#text-login-name').val(          $(btn).attr('data-bs-login-name'));
+    $('#text-personnel-name').val(      $(btn).attr('data-bs-personnel-name'));
+    $('#text-personnel-surname').val(   $(btn).attr('data-bs-personnel-surname'));
+    $('#text-email').val(               $(btn).attr('data-bs-email'));
+    $('#text-phone-number').val(        $(btn).attr('data-bs-phone-number'));
+
+    /// restrict password
+    $('#manage-perosnnel-form input[type=password]').val("");
+    $('#manage-personnel-form input[type=password]').attr('readonly', true);
+}
+
+function deletePersonnel(id) {
+    if (id == "") {
+        bs_alert('alert-wrapper', 'Select personnel account first', 'danger');
+        return;
+    }
+    /// personnel is selected
+    if (confirm('Do you really want to delete personnel with id: ' + id)) {
+        $.ajax({
+            method : "POST",
+            url : "/operator/delete_personnel?id="+id,
+            success: function(data) {
+                var data_table = $('#personnel-data-table').DataTable();
+                data_table.ajax.reload();
+
+                /// inform user about success
+                bs_alert('alert-wrapper', 'Personnel account successfully deleted', 'success');
+                deselectPersonnel();
+            } 
+        });
+    }
+}
+
+function bs_alert(wrapper, message, category) {
+    $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+}
+
+function deselectPersonnel() {
+    /// clear all fields
+    $('#manage-personnel-form input').val("");
+
+    /// allow password
+    $('#manage-personnel-form input[type=password]').attr('readonly', false);
+}
+
+
+</script>
+{% endblock %}
+
+{% block base_ajax_post %}
+<script type="text/javascript">
+     /// save edit
+    $('form').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            method : "POST",
+            url : "/operator/manage_personnel",
+            data: $('form').serialize(),
+            success: function(data) {
+                
+                /// project changes in table
+                if (data.refresh) {
+                    var data_table = $('#personnel-data-table').DataTable();
+                    data_table.ajax.reload();
+                    deselectPersonnel();
+                }
+                /// draw bootstrap alert
+                bs_alert('alert-wrapper', data.msg, data.type);
+            }
+        });
+    });
+</script>
+{% endblock %}

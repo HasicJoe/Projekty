@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %} Search connection{% endblock %}
+
+{% block flash_messages %}
+<div id="alert-wrapper"></div>
+{% endblock %}
+
+{%block body_content %}
+
+<div class="row">
+    <div class="col-4">
+        <form id="search-form" class="row mx-auto mt-5 alert alert-primary pe-0">
+            <h2 class="mb-3">Lookup connections</h2>
+            <div class="col-10">
+                <div class="form-floating mb-3">
+                    
+                    <input type="text" class="form-control form-control-lg" id="enter_stop_input" name="enter_stop"
+                    placeholder=" " onfocus="suggest_stops(this, event);" onkeyup="suggest_stops(this, event);">
+                    <input type="hidden" id="enter_stop_input_focus"/>
+                    <label for="floatingInput">Starting stop</label>
+                </div>
+                <div class="form-floating">
+                    <input type="text" class="form-control form-control-lg" id="exit_stop_input" name="exit_stop"
+                    placeholder=" " onfocus="suggest_stops(this, event);" onkeyup="suggest_stops(this, event);">
+                    <input type="hidden" id="exit_stop_input_focus"/>
+                    <label for="floatingInput">Exit stop</label>
+                </div>
+            </div>
+            <div class="col-1 ps-0 pe-0 me-0">
+                <button type="button" class="btn btn-primary h-100" 
+                onclick="swap_search_fields($('#enter_stop_input'), $('#exit_stop_input'));">
+                <span class="bi-arrow-down-up h2"></span></button>
+            </div>
+
+            <div class="col-6 mt-2">
+                <label for="date" class="h6">Date</label>
+                <input type="date" name="date" class="form-control" id="date" name="date">
+            </div>
+
+            <div class="col-5 mt-2">
+                <label for="time" class="h6">Time</label>
+                <input type="time" name="time" class="form-control" id="time" name="time">
+            </div>
+
+            <div class="col-12 mt-4">
+                <button type="button" class="btn btn-primary text-center w-100 btn-lg" onclick="search_connection(this);">
+                    <span class="class bi-search"></span> Search
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="col-8 mt-5" id="render-found-connections"></div>
+</div>
+
+
+<script>
+    function suggest_stops(input_field, event) {
+        if (event.keyCode == 40 || event.keyCode == 38 || event.keyCode == 13) {
+            var currentFocus = $('#' + input_field.id + '_focus');
+            var x = document.getElementById(input_field.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (event.keyCode == 40) { // down
+                currentFocus.val(parseInt(currentFocus.val()) +1);
+                addActive(x, currentFocus);
+            } else if (event.keyCode == 38) { //up
+                currentFocus.val(parseInt(currentFocus.val()) -1);
+                addActive(x, currentFocus);
+            } else if (event.keyCode == 13) { //enter
+                event.preventDefault();
+                if (x) {
+                    if (x.length == 1) {
+                        x[0].click();
+                    } else {
+                        if (parseInt(currentFocus.val()) > -1) 
+                            x[parseInt(currentFocus.val())].click();
+                    }
+                }
+            }
+            return;
+        } else {
+            $('#' + input_field.id + "_focus").val(-1);
+            $.ajax({
+                method : 'GET',
+                cache : false,
+                url : '/passenger/get_stops?stop_name='+input_field.value,
+                success: function(data) {
+                    autocomplete(input_field, data, event);
+                } 
+            });
+        }
+    }
+
+    function autocomplete(inp, arr, event) {
+        var a, b, i, val = inp.value;
+        /*close any already open lists of autocompleted values*/
+       
+        closeAllLists("", inp);
+        if (!val) return false;
+
+        /// set current focus value to -1
+        
+        /*create a DIV element that will contain the items (values):*/
+        a = document.createElement("DIV");
+        a.setAttribute("id", inp.id + "autocomplete-list");
+        a.setAttribute("class", "autocomplete-items");
+        /*append the DIV element as a child of the autocomplete container:*/
+        inp.parentNode.appendChild(a);
+        /*for each item in the array...*/
+        for (i = 0; i < arr.length; i++) {    
+            var stop_name = arr[i].name;
+            /*create a DIV element for each matching element:*/
+            b = document.createElement("DIV");
+            
+            /// convert stop name and val to uppercase without accents
+            var stop_name_raw = stop_name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+            var val_raw = val.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+
+            /*make the matching letters bold:*/
+            ind = stop_name_raw.toUpperCase().indexOf(val_raw.toUpperCase());
+            b.innerHTML = stop_name.substr(0, ind);
+            b.innerHTML += "<strong>" + stop_name.substr(ind, val.length) + "</strong>";
+            b.innerHTML += stop_name.substr(ind+val.length);
+
+            /*insert a input field that will hold the current array item's value:*/
+            b.innerHTML += "<input type='hidden' value='" + stop_name + "'>";
+            /*execute a function when someone clicks on the item value (DIV element):*/
+            b.addEventListener("click", function(e) {
+                /*insert the value for the autocomplete text field:*/
+                inp.value = this.getElementsByTagName("input")[0].value;
+                /*close the list of autocompleted values,
+                (or any other open lists of autocompleted values:*/
+                closeAllLists("",inp);
+            });
+            a.appendChild(b);
+        }
+        /*execute a function when someone clicks in the document:*/
+        document.addEventListener("click", function (e) {
+            closeAllLists(e.target, inp);
+        });
+
+    }
+
+    function addActive(x, currentFocus) {
+        if (!x) return false;
+        removeActive(x);
+        if (currentFocus.val() >= x.length) currentFocus.val(0);
+        if (currentFocus.val() < 0) currentFocus.val(x.length - 1);
+        x[currentFocus.val()].classList.add("autocomplete-active");
+    }
+
+    function removeActive(x) {
+        for (var i = 0; i < x.length; i++) 
+            x[i].classList.remove("autocomplete-active");
+    }
+
+    function closeAllLists(elmnt, inp) {
+        /*close all autocomplete lists in the document,
+        except the one passed as an argument:*/
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+            if (elmnt != x[i] && elmnt != inp) {
+                x[i].parentNode.removeChild(x[i]);
+            }
+        }
+    }
+
+    function swap_search_fields(start_stop, exit_stop) {
+        var temp = exit_stop.val();
+        exit_stop.val(start_stop.val());
+        start_stop.val(temp);
+    }
+
+    function search_connection(btn) {
+        var x = $('#search-form').serialize();
+        $.ajax({
+            method : 'POST',
+            data: $('#search-form').serialize(),
+            url : '/passenger/get_connection_list',
+            success: function(response) {
+                var wrapper = $('#render-found-connections');
+                wrapper.html("");
+                if (response.success) {
+                    response.data.forEach(function(connection) {
+                        var enter_stop_index =  connection.enter_stop.index;
+                        var exit_stop_index =   connection.exit_stop.index;
+                        render_connection(
+                            connection.connection, 
+                            enter_stop_index, 
+                            exit_stop_index, 
+                            connection.routes, 
+                            connection.date, 
+                            connection.time, 
+                            connection.first_class_available,
+                            connection.second_class_available,
+                            connection.curr_loc_html,
+                            wrapper
+                            ); 
+                    });
+                } else if (!response.success) {
+                    bs_alert('alert-wrapper', response.msg, response.type);
+                }
+            }
+        });
+    }
+
+    function render_main_stop(stop) {
+        return "<p class='mb-0'><code class='me-4'>" + stop.arrival + " - " +  stop.departure + "</code>" + stop.stop + "</p>";
+    }
+
+    function render_stop(stop) {
+        return "<p class='ms-2' style='font-size:12px''><code class='me-4' style='font-size:12px;'>" + stop.arrival + " - " +  stop.departure + "</code>" + stop.stop + "</p>";
+    }
+
+    function change_text(link) {
+        $(link).text(function(i, old) {
+            return old=='expand' ? 'collapse' : 'expand';
+        });
+    }
+
+    function render_connection(connection, enter, exit, routes, date, time, f_cls_available, s_cls_available, curr_loc, out) {
+        /// clear render group
+        out.html("");
+        var html_str = '';
+        html_str += 
+        "<div class='card mb-3'>" +
+         "<div class='card-header bg-primary mt-1'><p class='h3'>" + connection.link_name + "</p></div>" +
+         "<div class=card-body>";
+
+        html_str +=
+            render_main_stop(routes[enter]);
+
+        if ((exit-(enter+1)) > 0) {
+            html_str +=
+                "<a class='ms-5 my-2 fw-bold collapse-connection' style='text-decoration:none;' data-bs-toggle='collapse' type='button' data-bs-target='#coll"+connection.id+"' onclick='change_text(this);'>expand</a>" +
+                "<div class='collapse' id='coll"+connection.id+"'>"
+        }
+        for (var i = enter+1; i < exit; ++i) 
+            html_str += render_stop(routes[i]);
+
+        if ((exit-(enter+1)) > 0) {
+            html_str +=
+               "</div>"
+        }
+
+        html_str +=
+            render_main_stop(routes[exit]);
+
+
+        html_str +=
+          "<hr></hr>" +
+          "<div class='text-end d-flex'>" +
+           "<div class='text-start my-auto d-flex justify-content-start'>" +
+            "<h5 class='ms-5 text-warning'>First class seats available: " + f_cls_available + "</h5>" +
+            "<h5 class='ms-5 text-success'>Second class seats available: " + s_cls_available + "</h5>" +
+           "</div>" +
+           "<button type='button' class='btn btn-primary ms-auto' onclick='reserve("+connection.id+", \""+date+"\", \""+time+"\")'>Reserve</button>" +
+           "</div>" +
+           curr_loc +
+         "</div>" + 
+        "</div>";
+        out.append(html_str);
+    }   
+
+    function reserve(connection_id, date, time) {
+        var params = "?enter_stop="+$('#enter_stop_input').val()+"&exit_stop="+$('#exit_stop_input').val()+"&date="+date+"&time="+time;
+        window.location.href = '/passenger/reservation/'+connection_id + params;
+    }
+
+    function bs_alert(wrapper, message, category) {
+        $("#"+wrapper).html("<div class='alert alert-"+category+" alert-dismissible fade show' role='alert'>"+message+"<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button></div>");
+    }
+
+    $(document).ready(function() {
+        /// time -> set now
+        document.getElementById('time').value = new Date().toISOString().substring(11, 16);
+        /// date -> set today
+        document.getElementById('date').valueAsDate = new Date();
+    });
+    </script>
+    
+{% endblock %}
