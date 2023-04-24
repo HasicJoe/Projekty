@@ -1,0 +1,27 @@
+<!--   
+    Autor: Samuel Valaštín
+    HTML šablóna určená pre zobrazenie predspracovaneho datoveho ramca.
+-->
+
+{% extends "template.html" %}
+
+{% block custom_includes %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+{% endblock %}
+
+{% block custom_title %} Spracovaný dátový rámec {% endblock %}
+
+{% block custom_body_content %}
+    <div class='mt-3' id='back'>
+        <button class='btn btn-secondary btn-lg btn-block' onclick="history.back()">Späť na zoznam spracovaných dátových rámcov</button>
+    </div>
+    <div id='table'></div>
+{% endblock %}
+
+{% block custom_ajax %}
+
+<script type='text/javascript'>
+    var figure = {{ table | safe}};
+    Plotly.plot('table', figure, {});
+</script>
+{% endblock %}

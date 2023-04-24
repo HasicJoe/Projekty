@@ -1,0 +1,309 @@
+<!--   
+    Autor: Samuel Valaštín
+    HTML šablóna určená pre predspracovanie webovych pristupovych logov.
+        = umoznuje :
+            = drag and drop pre prilozenie webovych pristupovych logov
+            = rozsirene uzivatelske moznosti pre prah urcujuci rozdiel medzi uzivatlskymi zaznamami
+              urceny pre rozdelenie uzivatelskych zaznamov do uzivatelskych sedeni
+            = ponechane typy suborov pre nasledne ziskavanie znalosti
+-->
+
+{% extends "template.html" %}
+
+{% block custom_includes %}
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css"/>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+{% endblock %}
+
+{% block custom_title %} Predspracovanie a čistenie logu{% endblock %}
+
+{% block custom_body_content%}
+<div id="alert-wrap"> </div>
+<div id='charts' class='charts' style="max-width: 90%;">
+    <div class='row'>
+        <div class='col-7' id='table'></div>
+        <div class='col-5' id='crawlers'></div>
+    </div>
+    <div class='row'>
+        <div class='col-6' id='os'></div>
+        <div class='col-6' id='utility'></div>
+    </div>
+    <div class='row'>
+        <div class='col-7' id='session_info'></div>
+        <div class='col-5' id='regression'></div>
+    </div>
+    <div class='row'>
+        <div class='col-8' id='first_request'></div>
+        <div class='col-4'>
+            <div class='row h-50 py-0 my-0'>
+                <div id='cleaner' style='height:auto;'> </div>
+            </div>
+            <div class='row h-25'>
+                <div id='save_frame' style='display:none'>
+                    <button type="button" id='save_button' onclick='' class="btn btn-outline-success btn-lg btn-block">Uložiť medzi spracované logy</button>
+                    <button type="button" id='delete_button' onclick='' class="btn btn-outline-danger btn-lg btn-block">Zmazať</button>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+<div class="p-5 m-5 w-75 mx-auto bg-light bg-opacity-60" id='upload'>
+    <div class="mb-4">
+        <h5 class="d-flex justify-content-center"> Predspracovanie a čistenie logov. Podporované logovacie formáty COMBINED, COMMON. </h5>
+    </div>
+    <div class="w-75 mx-auto">
+    </div>
+    <form method="POST" enctype="multipart/form-data" class="form-group p-0 m-5 w-50 mx-auto" id="upload-form">
+        <div class='mb-3'>
+            <div class="dropzone" id="dropzone"></div>
+        </div>
+        <div class="form-check form-switch mb-5">
+            <input class="form-check-input mb-3" type="checkbox" id="stats" checked>
+            <label class="form-check-label mb-3" for="stats">Analýza a štatistika logovacích súborov</label>
+        </div>
+        <div class='mt-3 mb-3' id='options'>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            <b>Rozšírené možnosti</b>
+            <div id='option-form' class='mt-3' style='display:none'>
+                <h5>Pridanie podporovaných koncoviek súborov </h5>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">
+                        <span class="d-inline-block" tabindex="0" data-toggle="tooltip" data-placement="left" title="Podporované koncovky súborov z poľa 'Request', ktoré budú ponechané pri čistení logovacieho súboru">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-info" viewBox="0 0 16 16">
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <input type="text" class="form-control"  aria-describedby="basic-addon1", id='extensions' readonly>
+                    <input type="text" class="form-control" id='add-extension' placeholder='Koncovka'>
+                    <button type="button" class="btn btn-outline-success" id='add-to-list'>Pridať koncovku</button></br>
+                </div>
+                <h5>Prah pre rozdelenie záznamov do uživateľských sedení</h5>
+                <div class="input-group">
+                    <input type="number" class="form-control" id="session_tr">
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="basic-addon2">min</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-grid gap-2 mt-5 mb-3">
+            <button type="submit" class="btn btn-secondary btn-lg" id="upload-done">Odoslať logovací súbor</button>
+        </div>
+    </form> 
+</div>
+<div id="progress" style="display:none;">
+    <span class="d-inline-block" tabindex="0" data-toggle="tooltip" data-placement="bottom" title="V prípade dátovej sady s milionmi záznamov môže trvať desiatky sekúnd...">
+        <button class="btn btn-primary btn-lg btn-block" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="sr-only">Prebieha čistenie a spracovanie dátovej sady...</span>
+        </button>
+    </span>
+</div>
+
+{% endblock %}
+{% block custom_ajax %}
+<script>
+    $(document).ready(function(){
+        // inicializacia rozsirenych uzivatelskych moznosti pre predspracovanie
+        $('#extensions').val('.php, .html, .htm');
+        $('#session_tr').val(25);
+    });
+
+    function disable_pressed_buttons(){
+        // zablokovanie tlacidiel po uzivatelskej volbe
+        var save_button = document.querySelector('button#save_button');
+        var delete_button = document.querySelector('button#delete_button');
+        save_button.disabled = true;
+        delete_button.disabled = true;
+    }
+
+    function save_to_drive(metadata) {
+        // ulozenie spracovanych ramcov a statistik na google drive
+        disable_pressed_buttons();
+        $.ajax({
+            method : "POST",
+            url : "/save/save_to_drive?metadata="+metadata,
+            data : metadata,
+            success: function(data, textStatus, jqXHR) {
+                switch(jqXHR.status) {
+                    case 200:
+                        var button = document.querySelector('button#save_button');
+                        button.disabled = true;
+                        wrap_alert('dark', data.ok);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        delay(2000).then(() => window.location.href = "/processed_logs");
+                    break;
+                    default:
+                    case 205:
+                        window.scrollTo({ top: 0, behavior: 'smooth' });    
+                        wrap_alert('warning', data.error);
+                    break;
+                    case 206:
+                        window.scrollTo({ top: 0, behavior: 'smooth' });    
+                        wrap_alert('danger', data.error);
+                    break;
+                }
+            } 
+         });
+    }
+
+    function delete_data(metadata, relocate) {
+    // zmazanie docasne ulozenych lokalnych suborov
+        disable_pressed_buttons();
+        $.ajax({
+            method : "POST",
+            url : "/save/delete_processed_log?metadata="+metadata,
+            data : metadata,
+            success: function(data, textStatus, jqXHR) {
+                switch(jqXHR.status) {
+                    case 200:
+                        wrap_alert('dark', data.ok);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        if(relocate){
+                        delay(3000).then(() => window.location.href = "/preprocess");
+                        }
+                    break;
+                    default:
+                    case 203:    
+                        wrap_alert('warning', data.error);
+                    break;
+                    case 204:    
+                        wrap_alert('warning', data.error);
+                    break;
+                }
+            } 
+         }); 
+    }
+
+    function delay(time) {
+        // casove oneskorenie
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+
+    function wrap_alert(categ, msg) {
+        // oznam o vykonani cinnosti
+        $("#alert-wrap").html("<div class='alert alert-"+categ+"' role='alert' alert-dismissible>"+msg+"<button type='button' class='btn-close' data-bs-dismiss='alert'></button></div>");
+    }
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    var options = document.querySelector('#options'); 
+    options.addEventListener("click",function(e){    
+        $("#option-form").show();
+    });
+    
+    var add_extension = document.querySelector('#add-to-list');
+    add_extension.addEventListener('click', function(e){
+        if($('#add-extension').val().length == 0) {
+            wrap_alert('warning', 'Nemožno pridať prázdnu koncovku.');
+            return;
+        }
+        if($('#add-extension').val().indexOf(',') > -1) {
+            wrap_alert('warning', 'Neplatná koncovka.');
+            return;
+        }
+        var extension = $('#add-extension').val();
+        if(extension.startsWith('.')) {
+            new_value = $('#extensions').val() + ', ' + extension;
+        }
+        else {
+            new_value = $('#extensions').val() + ', .' + extension;
+        }
+        $('#extensions').val(new_value);
+        $('#add-extension').val('');
+    });
+
+    Dropzone.options.dropzone = {
+    // sprava prilozenia logovacich suborov a spravovanie nacitania spracovanych statistik a datovych ramcov
+      init: function() {
+            dz = this;
+            stats = false;
+            document.getElementById("upload-done").addEventListener("click", function handler(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if(dz.getQueuedFiles().length == 0){
+                    wrap_alert('danger', "Nemožno prejsť k predspracovaniu - chýba logovací súbor");
+                    return;
+                }
+                dz.processQueue();
+            });
+            this.on("sendingmultiple", function(data, xhr, formData){
+                formData.append("stats", $("#stats")[0].checked);            
+                formData.append("extensions", $('#extensions').val());
+                formData.append("session_tr", $('#session_tr').val());
+            });
+            this.on("processing", function(file) {
+                if($("#upload").is(":visible")){
+                    $("#upload").hide();
+                    $("#progress").show();
+                }
+            });
+            this.on("success", function(file, response) {
+                switch(response.status){
+                    case 200:
+                        $("#progress").hide();
+                        wrap_alert('success', 'Datová sada úspešne spracovaná.');
+                        if($("#stats")[0].checked) {
+                            Plotly.react('table', JSON.parse(response.table) , {});
+                            Plotly.react('crawlers', JSON.parse(response.crawlers) , {});
+                            Plotly.react('os', JSON.parse(response.os) , {});
+                            Plotly.react('utility', JSON.parse(response.utili) , {});
+                        }
+                        Plotly.react('cleaner', JSON.parse(response.cleaner) , {});
+                        Plotly.react('regression', JSON.parse(response.regression) , {});
+                        Plotly.react('session_info', JSON.parse(response.session_stats) , {});
+                        Plotly.react('first_request', JSON.parse(response.first_request) , {});
+                        // kontrola ci je zvoleny aktivny priecinok pre ulozenie na google drive
+                        if('unable' in response) {
+                            wrap_alert('warning', response.unable);
+                            delete_data(response.metadata, false);
+                        }
+                        else {
+                            $("#save_frame").show();
+                            $("#save_button").attr('onclick', 'save_to_drive(\"'+response.metadata+'\", true);');
+                            $("#delete_button").attr('onclick', 'delete_data(\"' + response.metadata + '\", true);');
+                        }
+                    break;
+                    case 201:
+                        $("#progress").hide();
+                        $("#upload").show();
+                        wrap_alert('danger', response.error);
+                    break;
+                    case 202:
+                    $("#progress").hide();
+                    $("#upload").show();
+                    wrap_alert('warning', response.error);
+                    break;
+
+                }
+            });
+
+      },
+      url : "analyze/file_upload",
+      autoProcessQueue: false,
+      uploadMultiple: true,
+      parallelUploads: 1,
+      paramName: "log-file", 
+      maxFilesize: 2000,
+      acceptedFiles: ".txt, .log, application/zip, application/gzip",
+      maxFiles: 1,
+      dictDefaultMessage: "Pretiahnite logovací súbor/archív alebo kliknite pre výber súboru.\n Podporované súbory s koncovkou .txt, .log a archívy ZIP a GZIP." ,
+      dictFallbackMessage: "Váš prehliadač nepodporuje drag & drop nahrávanie súborov.",
+      dictInvalidFileType: "Nemožno nahrať súbory tohto typu.",
+      dictFileTooBig: "Súbor je príliš veľký (max 2000MiB).",
+      dictResponseError: "Server error.",
+      dictMaxFilesExceeded: "Nemožno nahrať viac súborov.",
+      dictCancelUpload: "Zrušenie nahrávania.",
+      dictRemoveFile: "Odstránenie súboru.",
+      dictCancelUploadConfirmation: "Vážne chcete vymazať tento súbor?",
+      dictUploadCanceled: "Nahrávanie zrušené.",
+    };
+</script>
+{% endblock %}

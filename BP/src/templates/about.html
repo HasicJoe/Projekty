@@ -1,0 +1,51 @@
+{% extends "template.html" %}
+
+
+{% block custom_includes %}
+
+{% endblock %}
+
+{% block custom_title %} O projekte {% endblock %}
+
+{% block custom_body_content %}
+<div class='mt-2 pt-2 mx-1'>
+    <h2 class='mt-2'>Manuál k spusteniu a inštalácii bakalárskej práce - Získavanie znalostí z webových logov (Samuel Valaštín, 2022)</h2>
+    <p>Tento manuál slúži ako návod na lokálne spustenie implementovanej aplikácie pre získavania znalostí z webových prístupových logov. Táto aplikácia, ktorá bola vyvinutá ako praktická časť bakalárskej práce bola vyvíjaná na <strong>Linuxovom operačnom systéme</strong>. Vzhľadom na fakt, že aplikácia po predspracovaní ukladá spracované dátové rámce a grafické objekty získaných štatistík na <strong>Google Disk</strong>, tak sa odporúča pre prácu s touto aplikáciou využívať prehliadač <strong>Google Chrome</strong>.  Aplikácia však umožňuje beh a spustenie aj na iných dostupných prehliadačoch.</p>
+    <h2 class='mt-2'>Návod a prerekvizity pred lokálnym spustením aplikácie</h2>
+    <p>Táto podsekcia definuje potrebné prerekvizity a návod, ktorý informuje o spôsobe, akým je možné implementovanú aplikáciu spojazdniť.</p>
+    <h3 class='mt-2'>Prerekvizity a technické informácie</h3>
+    <p><strong>1).</strong> V podzložke <strong>/app</strong> je k dispozícii textový súbor <strong>requirements.txt</strong> so všetkými požiadavkami a externými python balíčkami, ktoré implementovaná aplikácia vyžaduje pre svoju činnosť.  V prípade využitia na webovom serveri je nutné odkomentovať posledný riadok tohto priloženého súboru, ktorý reprezentuje požiadavku na webový server. Všetky externé <strong>Javascriptové</strong> knižnice sú prilinkované prostredníctom CDN a tak nie je nutné ich priloženie, či prípadná inštalácia.</p>
+    <p><strong>2).</strong> Pre nainštalovanie potrebných externých balíčkov je potrebné mať nainštalovaný interpret jazyku <em>Python</em>, pričom aplikácia bola implementovaná a odtestovaná vo verzii <strong>Python 3.9.2</strong>. Rovnako je potrebné mať nainštalovaný <em>Python Package Manager (pip)</em>, pričom pre vývoj aplikácie som využíval package manager vo verzii <strong>pip 20.2.4</strong>.</p>
+    <h3 class='mt-2'>Návod pre lokálne spustenie aplikácie (Linux OS)</h3>
+    <p>Tento návod obsahuje informácie k lokálnemu spusteniu aplikácie po splnení vyššie popísaných prerekvizít.</p>
+    <p><strong>1).</strong> Po nainštalovaní balíku Python a Package Manageru pre tento jazyk je najskôr potrebné nainštalovať externé balíky, ktoré aplikácia vyžaduje pre svoju činnosť : <strong>python -m pip install -r requirements.txt</strong>
+    Ideálne je využit python environment, v prípade ak je nainštalovaný niektorá zo závislostí je vhodné nainštalovať potrebné závislosti v odtestovaných verziách prostredníctvom: <strong>python -m pip install -U -r requirements.txt</strong>
+    V textovom súbore <em>requirements.txt</em> sú špecifikované verzie balíčkov, ktorých činnosť v spoluprácii s aplikáciou bola riadne odtestovaná. </p>
+    <p><strong>2).</strong> Po nainštalovaní je pripravený jednoduchý script, ktorý umožnuje naštartovanie jednoduchého HTTP serveru. Spustenie tohto skriptu je možné vykonať z terminálu prostredníctvom kombinácie príkazov:
+    <strong>chmod +x run.sh</strong> -- slúži pre polovenie spustenia skriptu run.sh
+    <strong>./run.sh</strong> -- pre naštartovanie HTTP serveru</p>
+    <p><strong>3).</strong> V prípade úspešného  naštartovania HTTP serveru a po splnení prerekvizít je možné k aplikácii pristúpiť z prostredia webového prehliadača vložením nasledujúcej adresy: <strong><a href="http://localhost:5000/">http://localhost:5000/</a></strong> alebo prípadne adresy <strong><a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a></strong></p>
+    <p><strong>4).</strong> Na hlavnej stránke implementovanej aplikácie je k dispozícii rozcestník, ktorý obsahuje odkazy na všetky implementované časti aplikácie a rovnako sú k dispozícii menšie datasety, ktoré kliknutím na dátovu sadu zo zoznamu pripravených dátových sád umožňuje lokálne stiahnutie týchto datasetov, ktorými možno vykonanať predspracovanie a po nastavení ukladania je možné vykonať aj následnú modelovaciu časť určenú pre získavanie znalostí z týchto predspracovaných dát.</p>
+    <h3 class='mt-2'>Aplikácia je dostupná aj na webovom hostingu</h3>
+    <p>Implementovaná aplikácia je rovnako dostupná aj na webovom hostingu na adrese: <strong><a href="https://logmine.herokuapp.com/">https://logmine.herokuapp.com/</a></strong></p>
+    <p>Nasadená aplikácia umožnuje demonštráciu činnosti aplikácie, avšak vzhľadom na minimálne pamäťové a výpočetné možnosti voľného hostingu sa odporúča, vzhľadom na povahu aplikácie lokálny beh.</p>
+    <h3 class='mt-2'>Správa ukladania prostredníctvom Google Drive API</h3>
+    <p>Implementovaná aplikácia vyžaduje prihlásenie Google účtom a nastavenie aktívneho priečinku, do ktorého sú ukladané predspracované dátové rámce a vizualizované štatistiky. Toto nastavenie je možné vykonať prostredníctvom výberu položky <strong>Správa  ukladania spracovaných rámcov/štatistík</strong> z rozcestníku dostupného na hlavnej stránke aplikácie. Bližšie informácie sú k dispozícii v technickej dokumentácii k bakalárskej práci</p>
+    <h2>Upozornenie !!!</h2>
+    <p>Aplikácia umožňuje zmenu prihláseného užívateľa pre ukladanie dátových rámcov a štatistík do Google priečinku špecifikovaného užívatela. Pri využívaní aplikácii na webovom hostingu na adrese <strong><a href="https://logmine.herokuapp.com/">https://logmine.herokuapp.com/</a></strong> tento hosting nepodporuje úpravu portov, ktoré knižnica <strong>pyDrive2</strong> a  server pre autentifikáciu vyžaduje a tak nie je možné vykonať autentifikáciu. Pre lokálne spustenie všetko pracuje správne a aplikácia umožňuje zmeniť aktívneho užívateľa. Na hostingu je prihlásený užívateľ a aplikácia zároveň poskytuje všetkú ďaľej implementovanú funkcionalitu k správe ukladania.</p>
+    <h3 class='mt-2'>Kontakt</h3>
+    <p>V prípade nejasností alebo problémov ohľadne nastavenia aplikácie či jej činnosti ma môžte kontaktovať prostredníctvom e-mailu: <strong>xvalas10@stud.fit.vutbr.cz</strong> respektíve osobný e-mail: <strong>samuel.valastinnn@gmail.com</strong>. Rád vam zodpoviem na vaše otázky.</p>
+    <div class='mt-2'>
+        <h2> Pre viac informácii je k dispozícii technická správa </h2>
+        <div class="list-group mt-3 mb-3">
+            <a href="/download_pdf" class="list-group-item list-group-item-action"> Technická správa k bakalárskej práci (PDF)</a>
+          </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_ajax %}
+
+<script type='text/javascript'>
+</script>
+{% endblock %}

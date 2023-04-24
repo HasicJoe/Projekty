@@ -1,0 +1,17 @@
+[
+	{
+    "CategoryId": 1,
+    "CategoryName": "Sport",
+    "ProductCount": 2
+	},
+	{
+    "CategoryId": 2,
+    "CategoryName": "Phones",
+    "ProductCount": 2
+	},
+	{
+    "CategoryId": 3,
+    "CategoryName": "Books",
+    "ProductCount": 3
+	}
+]

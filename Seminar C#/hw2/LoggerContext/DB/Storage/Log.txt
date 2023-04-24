@@ -1,0 +1,18 @@
+[19/03/2023 13:12:01] Add; Category; Success; 1; Sport; 1
+[19/03/2023 13:12:01] Add; Category; Success; 2; Phones; 2
+[19/03/2023 13:12:01] Add; Category; Success; 3; Books; 3
+[19/03/2023 13:12:01] Add; Product; Success; 1; Ball; 1
+[19/03/2023 13:12:01] Add; Product; Success; 2; Stick; 1
+[19/03/2023 13:12:01] Add; Product; Success; 3; myPhone15; 2
+[19/03/2023 13:12:01] Add; Product; Success; 4; myPhone16; 2
+[19/03/2023 13:12:01] Add; Product; Success; 5; Brno-history; 3
+[19/03/2023 13:12:01] Add; Product; Success; 6; Moon; 3
+[19/03/2023 13:12:04] Add; Product; Failure; Unable to match user request - invalid arguments.
+[19/03/2023 13:12:05] Add; Product; Failure; Unable to match user request - invalid arguments. Input arguments have invalid length. Expected length: 4
+[19/03/2023 13:12:09] Add; Product; Failure; Unable to match user request - invalid arguments. Input arguments have invalid length. Expected length: 2
+[19/03/2023 13:12:15] Add; Product; Failure; Invalid add-product operation. Category with categoryId 5 does not exists.
+[19/03/2023 13:12:18] Add; Product; Success; 7; 1; 3
+[19/03/2023 13:12:21] Add; Product; Failure; Unable to match user request - invalid arguments.
+[19/03/2023 13:12:24] Get; Product; Success;
+[19/03/2023 13:12:29] Get; Product; Failure; Unable to match user request - invalid arguments. Input arguments have invalid length. Expected length: 1
+[19/03/2023 13:12:34] Get; Product; Failure; Unable to match user request - invalid arguments.

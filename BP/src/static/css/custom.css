@@ -1,0 +1,324 @@
+/*
+Autor: Samuel Valaštín
+    Vlastné štýlovacie selektory.
+*/
+
+.sidebar {
+    min-width: 4vw;
+    max-width:8vw;
+    overflow: none;
+    z-index:2;
+}
+
+ul.nav {
+    position: fixed;
+    display:flex;
+    padding-top: 8vh;
+    flex-direction: column;
+    height: 100%;
+    background-color: #e1e1e1;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: auto;
+
+}
+
+.content {
+    display: flex;
+    min-height: 95vh;
+    flex-direction: column;
+    justify-content: flex-start;
+    width:89vw;
+    margin-left:9.5vw;
+    margin-top: 0;
+    padding: 10px;
+    z-index: 0;
+}
+
+.nav-item {
+    transition: all 1s linear;
+    min-width: 3vw;
+    height: auto;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    padding-left:1vw;
+    padding-right:1vw;
+    margin-top:3vh;
+    margin-bottom:3vh;
+}
+
+.nav-item:hover {
+    background-color: #303030;
+    z-index:2;
+    width: 9vw;
+}
+
+.nav-item:hover .item-text {
+    display:inline;
+    padding-left: 10px;
+    color: #f1f1f1;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.nav-item:hover #icon {
+    color: #f1f1f1;
+    width: 16px;
+    height : 16px;
+}
+
+.nav-item:last-of-type {
+    margin-top: auto;
+}
+
+a.link {
+    text-decoration: none;
+}
+
+.item-text {
+    display:none;
+}
+
+body {
+    margin:0;
+    padding:0;
+}
+
+.footer {
+  margin-top: auto;
+  bottom : 0;
+  left : 0;
+  z-index : -1;
+  width : 100%;
+  height : 5vh;
+  line-height : 5vh;
+  text-align : center;
+  background-color : #303030;
+}
+
+.footer span {
+  color : #F3F3F3;
+  font-size : 16px;
+  font-weight: 500;
+}
+
+#chart {
+    padding:0;
+    margin:0;
+    z-index:0;
+}
+
+#dropzone {
+    border: 2px solid #0d6efd;
+    border-radius: 2%;
+    background: repeating-linear-gradient(
+        -20deg,
+       #e1e1e1,
+       #d7d7d7 10px,
+       #e1e1e1 20px
+    );
+    padding: 0px 0px; 
+    font-weight: bold;
+    text-align: center;
+    padding-left : 50px;
+    padding-right : 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.btn-close {
+    display:inline-block;
+}
+
+#options {
+   margin-left: auto;
+   margin-right: auto;
+   text-align:center;
+}
+
+#options b {
+    text-decoration:underline;
+}
+
+#option-form {
+    width: 180%;
+    position: relative;
+    left: -250px;
+    text-decoration: None;
+}
+
+#options:hover {
+    color: #0d6efd;
+}
+
+#extensions {
+    width : 60%;
+    margin-left: 0;
+    margin-right:20px;
+    height: 40px;
+}
+
+#add-extension {
+    width:10%;
+    height: 40px;
+    margin-right: 5px;
+}
+
+#add-to-list {
+    width: 15%;
+    height: 40px;
+    font-size: 14px;
+}
+
+#basic-addon1 {
+    height:40px;
+    width:50px;
+    margin-right:0px;
+    border-radius: 0%;
+    border :1px solid #303030;
+}
+
+#basic-addon1:hover {
+    background-color: #0d6efd;
+}
+
+#option-form h5 {
+    text-align:left;
+    font-size: 14px;
+}
+#table {
+    padding:0; 
+    margin:0; 
+}
+
+#crawlers {
+    padding:0; 
+    margin:0; 
+    padding-left:50px;
+}
+
+#os {
+    padding:0; 
+    margin:0; 
+    margin-bottom: 30px;
+}
+
+#utility {
+    padding:0; 
+    margin:0; 
+    margin-bottom: 30px;
+}
+
+#cleaner {
+    padding:0; 
+    margin:0; 
+    margin-top: 20px;
+}
+
+#session_info {
+    padding:0; 
+    margin:0;
+}
+
+#regression {
+    padding:0; 
+    margin:0;
+}
+
+#first_request {
+    margin-top: 20px;
+}
+
+#save_frame {
+    margin-top: 110px;
+    padding-left: 50px;
+    padding-bottom: 100px;
+    text-align: center;
+    display: block;
+}
+
+#cluster-as-r-table{
+    padding-bottom: 40px;
+  }
+  
+
+.show-button {
+    width:110px;
+    height:31.5px;
+    font-size:13px;
+    background-color: #303030;
+    color : #f1f1f1;
+    font-weight: bold;
+    border: 1px solid #000000;
+    padding-left: 2px;
+    padding-right : 2px;
+    margin-left : 10px;
+    margin-right : 5px;
+    border-radius : 5%;
+}
+
+.show-button:hover {
+    background-color: #0d6efd;
+    border: 1px solid #303030;
+}
+
+.model-button {
+    width:90px;
+    height:31.5px;
+    font-size:13px;
+    background-color: #ff712d;
+    color : #303030;
+    font-weight: bold;
+    border: 1px solid #303030;
+    padding-left: 2px;
+    padding-right : 2px;
+    margin-left : 10px;
+    margin-right : 5px;
+    border-radius : 5%;
+}
+
+.model-button:hover {
+    background-color: #303030;
+    color : #f1f1f1;
+}
+
+.delete-button {
+    width:85px;
+    height:31.5px;
+    font-size:13px;
+    background-color: #f14d4d;
+    color : #303030;
+    font-weight: bold;
+    border: 1px solid #303030;
+    padding-left: 2px;
+    padding-right : 2px;
+    margin-left : 10px;
+    margin-right : 5px;
+    border-radius : 5%;
+}
+
+.delete-button:hover {
+    background-color: #303030;
+    color : #f1f1f1;
+}
+
+#cluster {
+    padding:0; 
+    margin:0;
+}
+
+#title {
+    text-align:center; 
+    color:#0d6efd;
+}
+
+ul .source{
+  float: right;
+}
+
+ul .source button{
+  height:32px;
+  width: 80px;
+  font-size: 15px;
+  line-height: 2px
+}

@@ -1,0 +1,41 @@
+<!--   
+    Autor: Samuel Valaštín
+    Zobrazenie štatistík získaných počas predspracovania dát.
+-->
+
+
+{% extends "template.html" %}
+
+{% block custom_includes %}  
+{% endblock %}
+
+{% block custom_title %} Štatistiky logu {% endblock %}
+
+{% block custom_body_content%}
+<div id='chart' class='chart' style="max-width: 90%;">
+    <div class='row'>
+        <div class='col-7' id='table'></div>
+        <div class='col-5' id='crawlers'></div>
+    </div>
+    <div class='row'>
+        <div class='col-6' id='os'></div>
+        <div class='col-6' id='utility'></div>
+    </div>
+    <div class='row'>
+        <div class='col-7' id='session_info'></div>
+        <div class='col-5' id='regression'></div>
+    </div>
+    <div class='row'>
+        <div class='col-7' id='cleaner'></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_ajax %}
+<script>
+    $(document).ready(function() {
+    
+    });
+
+</script>
+{% endblock %}

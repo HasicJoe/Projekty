@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "keA7JFy6RUxv85WKPppsiVHg/oC5GrAxHsb7h0GaEH4ONLIxX0K9e059szKovP5FPIDX6ER2gp9v79/Hz8P4cw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\GamePC\\Desktop\\HW3 odovzdanie\\Assignment\\src\\PV178.Homeworks.HW03\\PV178.Homeworks.HW03.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\GamePC\\.nuget\\packages\\csvhelper\\15.0.2\\csvhelper.15.0.2.nupkg.sha512",
+    "C:\\Users\\GamePC\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}

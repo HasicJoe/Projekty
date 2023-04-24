@@ -1,0 +1,207 @@
+<!--   
+    Autor: Samuel Valaštín
+    HTML šablóna určená pre zobrazenie spracovaných rámcov a štatistík
+        = poskytuje prilezitosti pre:
+            = zobrazenie štatistík
+            = zobrazenie spracovaných dátových rámcov
+            = modelovanie zvoleneho datoveho ramca
+            = zmazanie zvoleneho datoveho ramca a statistik
+-->
+
+
+{% extends "template.html" %}
+
+{% block custom_includes %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js" defer></script>  
+{% endblock %}
+
+{% block custom_title %} Spracované logy {% endblock %}
+
+{% block custom_body_content%}
+
+<div id="alert-wrap"> </div>
+<div id='process-wrap'>
+    <div id="progress">
+        <span class="d-inline-block" tabindex="0" data-toggle="tooltip" data-placement="bottom" title="V prípade chyby skúste 'refreshnúť' stránku">
+            <button class="btn btn-primary btn-lg btn-block mt-5" type="button" disabled>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="sr-only">Prebieha načítanie štatistík z google drive...</span>
+            </button>
+        </span>
+    </div>
+    <div class="w-100 p-5 mt-5">
+        <table id="processedlogs" class="table table-hover" style="width:104%;position: relative;left: -50px;">
+            <caption>
+                Spracované logy
+            </caption>
+        </table>
+    </div>
+</div>
+<div id='chart' class='chart' style="max-width: 90%; display:None;">
+    <div class='row'>
+        <button class="btn btn-primary btn-lg btn-block mt-3" type="button" id='back-button'>
+            <span class="sr-only">Späť na tabuľku predspracovaných logov</span>
+        </button>
+    </div>
+    <div class='row'>
+        <div class='col-7' id='table'></div>
+        <div class='col-5' id='crawlers'></div>
+    </div>
+    <div class='row'>
+        <div class='col-6' id='os'></div>
+        <div class='col-6' id='utility'></div>
+    </div>
+    <div class='row'>
+        <div class='col-7' id='session_info'></div>
+        <div class='col-5' id='regression'></div>
+    </div>
+    <div class='row'>
+        <div class='col-8' id='first_request'></div>
+        <div class='col-4' id='cleaner'></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_ajax %}
+<script>
+    $(document).ready(function() {
+        // nacitanie riadkov tabulky(riadky reprezentuju spracovane datove ramce a ich statistiky)
+        var logs_table = $('#processedlogs').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/sk.json"
+            },
+            "ajax" : {
+                "url" : "/save/load_processed_logs",
+                'type' : "GET",
+                "dataSrc" : function(json) {
+                    $("#progress").hide();
+                    return json.data
+                }
+            },
+            "columns" : [
+            { data : "time",                    title : "Čas uloženia" },
+            { data : "user",                    title : "Nahral" },
+            { data : "format",                  title : "Formát" },
+            { data : "n_of_items",              title : "Spracované záznamy" },
+            { data : "n_of_users",              title : "Počet uživateľov" },
+            { data : "n_of_sessions",           title : "Počet sedení" },
+            { data : "n_of_multiple_sessions",  title : "Počet sedení (>1)" },
+            { defaultContent : "", orderable : false,
+            render : function ( data, type, row, meta ) {
+                return "<button class='btn btn-success btn-sm' type='button'\
+                onclick='load_stats(\""+row.id+"\");'>Zobraziť štatistiky</button>\
+                <button class='show-button' type='button'\
+                parsed_file='"+row.filename+"'>Zobraziť dataset</button>\
+                <button class='model-button' type='button'\
+                parsed_file='"+row.filename+"'>Modelovať</button>\
+                <button class='delete-button' type='button'\
+                parsed_file='"+row.filename+"'>Zmazať</button>";
+            }
+            }]
+        });
+    });
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    function wrap_alert(categ, msg) {
+        $("#alert-wrap").html("<div class='alert alert-"+categ+"' role='alert' alert-dismissible>"+msg+"<button type='button' class='btn-close' data-bs-dismiss='alert'></button></div>");
+    }
+
+    var back = document.querySelector('#back-button'); 
+    back.addEventListener("click",function(e){    
+        $("#chart").hide();
+        $("#process-wrap").show();
+
+    });
+
+    $(document).on('click', '.model-button', function(){
+        var param = $(this).attr('parsed_file');
+        if(param) {
+            window.location = '/setup_mining?file=' + param;
+        }
+        else {
+            wrap_alert('warning', "Nepodarilo sa získať adresu spracovaného logovacieho súboru.");
+        }
+    });
+
+    $(document).on('click', '.show-button', function(){
+        var param = $(this).attr('parsed_file');
+        if(param) {
+            window.location = '/load_dataset?file=' + param;
+        }
+        else {
+            wrap_alert('warning', "Nepodarilo sa získať adresu spracovaného logovacieho súboru.");
+        }
+    });
+
+    $(document).on('click', '.delete-button', function(){
+        var id = {
+            'frame_id' : $(this).attr('parsed_file')
+        };
+        $.ajax({
+            method : "POST",
+            url : "/save/delete_processed",
+            data : id, 
+            success: function(data, textStatus, jqXHR) {
+                if('error' in data){
+                    wrap_alert('danger', data.error)
+                }
+                else if('ok' in data){
+                    location.reload();
+                    wrap_alert('dark', data.ok);
+                }
+            } 
+         }); 
+    });
+
+    function load_stats(id) {
+        $.ajax({
+            method : "POST",
+            url : "/save/load_stats?id="+id,
+            data : id, 
+            success: function(data, textStatus, jqXHR) {
+                switch(jqXHR.status) {
+                 case 200:
+                    load_data(data);
+                 break;
+                 default:
+                 case 207:
+                 window.scrollTo({ top: 0, behavior: 'smooth' });    
+                 wrap_alert('warning', data.error);
+                 break;
+                 case 208:
+                 window.scrollTo({ top: 0, behavior: 'smooth' });    
+                 wrap_alert('danger', data.error);
+                 break;
+                }
+            } 
+         });
+    }
+
+    function load_data(data) {
+        $("#chart").show();
+        $("#process-wrap").hide();
+        if("table" in data) {
+            Plotly.react('table', JSON.parse(data.table) , {});
+        }
+        if("crawlers" in data) {
+            Plotly.react('crawlers', JSON.parse(data.crawlers) , {});
+        }
+        if("os" in data) {
+            Plotly.react('os', JSON.parse(data.os) , {});
+        }
+        if("utili" in data) {    
+            Plotly.react('utility', JSON.parse(data.utili) , {});
+        }
+        Plotly.react('cleaner', JSON.parse(data.cleaner) , {});
+        Plotly.react('regression', JSON.parse(data.regression) , {});
+        Plotly.react('session_info', JSON.parse(data.session_stats) , {});
+        Plotly.react('first_request', JSON.parse(data.first_request) , {});
+    }
+
+</script>
+{% endblock %}

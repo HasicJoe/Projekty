@@ -1,0 +1,13 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=076df8c3_002D7702_002D4873_002D8c28_002Dcd69a8bbcf4e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ThreeSharksOrderedByNumberOfAttacksOnMenQuery_ReturnsExpected" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;MSTest::D783428C-0A08-4B93-A5A1-1FA56C486C36::net6.0::PV178.Homeworks.HW03.Tests.QueriesTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=c5fe7aed_002Dc129_002D43bf_002D991e_002Df2a6348dd414/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="InfoAboutPeopleThatNamesStartsWithCAndWasInBahamasQuery_ReturnsExpected" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;MSTest::D783428C-0A08-4B93-A5A1-1FA56C486C36::net6.0::PV178.Homeworks.HW03.Tests.QueriesTest.InfoAboutPeopleThatNamesStartsWithCAndWasInBahamasQuery_ReturnsExpected&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::D783428C-0A08-4B93-A5A1-1FA56C486C36::net6.0::PV178.Homeworks.HW03.Tests.QueriesTest.MostProlificNicknamesInCountriesQuery_ReturnsExpected&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::D783428C-0A08-4B93-A5A1-1FA56C486C36::net6.0::PV178.Homeworks.HW03.Tests.QueriesTest.SwimmerAttacksSharkAverageSpeedQuery_ReturnsExpected&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

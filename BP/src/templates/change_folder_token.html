@@ -1,0 +1,182 @@
+<!--   
+    Autor: Samuel Valaštín
+    HTML šablóna určená pre spravu ulozenia na google disku.
+    Poskytuje možnosti:
+        = zmeniť aktívny priečinok (do ktoreho sa ukladaju spracovane ramce a štatistiky)
+        = prelistovať obsah aktívneho priečinku
+        = vytvoriť priečinok na google drive
+        = vyhľadať dostupné priečinky
+        = zmeniť prihláseného uživateľa
+-->
+
+{% extends "template.html" %}
+
+{% block custom_includes %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+{% endblock %}
+
+{% block custom_title %} Správa google drive {% endblock %}
+
+{% block custom_body_content %}
+<div id="alert-wrap"> </div>
+<form method="POST" id='tokenchange' class="w-50 mx-auto">
+    <h3 class="text-center mb-4 mt-4">Zmena priečinku pre ukladanie spracovaných rámcov/štatistík</h3>
+    <div class="form-floating mb-2">
+        <input type="text" class="form-control" name="current_token"  id="current_token" value='{{ current_token }}' readonly/>
+        <label for="current_token">Aktuálny identifikátor priečinku</label>
+    </div>
+    <div class="form-floating mt-3 mb-2">
+        <input type="text" class="form-control" name="new_token"  id="new_token"/>
+        <label for="new_token">Nastaviť nové ID priečinku na G drive</label>
+    </div>
+    <div class="d-grid gap-2 mt-3">
+        <button type="submit" class="btn btn-success btn-lg">Zmeniť aktívny priečinok</button>
+    </div>
+</form>
+
+
+<div class='mt-5 pt-5 d-flex flex-column w-50 mx-auto'>
+    <h5> Rozšírené možnosti </h5>
+    <button type="button" class="mt-3 btn btn-danger btn-lg btn-block" id='list-folder-button'>Prelistovať obsah aktívneho priečinku na google drive</button>
+    <button type="button" class="mt-3 btn btn-warning btn-lg btn-block" id='create-folder-button'>Vytvoriť priečinok na google drive</button>
+    <form method='POST' id='create-folder'  style='display:None;'>
+        <div class="form-floating mt-3 mb-2">
+            <input type="text" class="form-control" name="foldername"  id="foldername"/>
+            <label for="foldername">Názov priečinku</label>
+        </div>
+        <button type="submit" class="btn btn-success btn-lg btn-block">Vytvoriť priečinok</button>
+    </form>
+    <button type="button" class="mt-3 btn btn-secondary btn-lg btn-block" id='find-folder-button'>Vyhľadať dostupné priečinky</button>
+    {% if localhost == 'True' %}
+        <button type="button" class="mt-3 btn btn-primary btn-lg btn-block" id='relog-button'>Zmeniť prihláseného uživateľa</button>
+    {% endif %}
+</div>
+
+<div class='mt-3 pt-3 mb-3 w-75 mx-auto'>
+    <table id='data' class='table table-bordered table-striped mt-4'></table>
+</div>
+<div class='mt-3 pt-3 mb-3 w-75 mx-auto'>
+    <table id='folders' class='table table-bordered table-striped'></table>
+</div>
+{% endblock %}
+
+{% block custom_ajax %}
+<script type="text/javascript">
+
+function wrap_alert(categ, msg) {
+    $("#alert-wrap").html("<div class='alert alert-"+categ+"' role='alert' alert-dismissible>"+msg+"<button type='button' class='btn-close float-right' data-bs-dismiss='alert'></button></div>");
+}
+
+function toggle_buttons(val) {
+    $(':button').prop('disabled', val);
+}
+$('form#tokenchange').on('submit', function(e) {
+    toggle_buttons(true);
+    e.preventDefault();
+    $.ajax({
+        method : "POST",
+        url : "/save/change_folder_token",
+        data: $('form#tokenchange').serialize(),
+        success: function(data, textStatus, jqXHR) {
+            toggle_buttons(false);
+            switch(jqXHR.status) {
+                case 200:
+                wrap_alert('success', data.ok);
+                $('input#current_token').val(data.token);
+                $('input#new_token').val('');
+                $('table#data').html('');
+                $('table#folders').html('');
+                break;
+                default:
+                case 201:
+                wrap_alert('warning', data.error);
+                break;
+            }
+        },
+    });
+});
+
+$('form#create-folder').on('submit', function(e) {
+    e.preventDefault();
+    toggle_buttons(true);
+    $.ajax({
+        method : "POST",
+        url : "/save/create_folder",
+        data: $('form#create-folder').serialize(),
+        success: function(data, textStatus, jqXHR) {
+            toggle_buttons(false);
+            switch(jqXHR.status) {
+                case 200:
+                wrap_alert('success', data.ok);
+                break;
+                default:
+                case 201:
+                wrap_alert('warning', data.error);
+                break;
+            }
+        },
+    });
+});
+
+var check_folder = document.querySelector('#list-folder-button'); 
+check_folder.addEventListener("click", function(e){    
+    toggle_buttons(true);
+    e.preventDefault();
+    $.ajax({
+        method : "POST",
+        url : "/save/check_folder_data",
+        data: $('form').serialize(),
+        success: function(data, textStatus, jqXHR) {
+            toggle_buttons(false);
+            $('table#data').html(data.data);
+            $('html, body').scrollTop($(document).height());
+        },
+    });
+});
+
+var find_folders = document.querySelector('#find-folder-button'); 
+find_folders.addEventListener("click", function(e){    
+    toggle_buttons(true);
+    e.preventDefault();
+    $.ajax({
+        method : "POST",
+        url : "/save/find_available_folders",
+        data: $('form').serialize(),
+        success: function(data, textStatus, jqXHR) {
+            toggle_buttons(false);
+            $('table#folders').html(data.data);
+            $('html, body').scrollTop($(document).height());
+        },
+    });
+});
+
+var create_folder = document.querySelector('#create-folder-button');
+create_folder.addEventListener("click", function(e){
+    $('form#create-folder').show();
+});     
+
+var relog = document.querySelector('#relog-button');
+relog.addEventListener("click", function(e){    
+    toggle_buttons(true);
+    e.preventDefault();
+    $.ajax({
+        method : "POST",
+        url : "/save/relog",
+        success: function(data, textStatus, jqXHR) {
+            toggle_buttons(false);
+            switch(jqXHR.status) {
+                case 200:
+                wrap_alert('success', data.ok);
+                $('input#current_token').val('Aktuálne nie je zvolený žiaden token');
+                $('input#new_token').val('');
+                break;
+                default:
+                case 201:
+                wrap_alert('warning', data.error);
+                break;
+            }
+        },
+    });
+});
+</script>
+{% endblock %}

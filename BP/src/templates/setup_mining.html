@@ -1,0 +1,382 @@
+<!--   
+    Autor: Samuel Valaštín
+    HTML šablóna určená pre volbu vstupných parametrov pre dostupne dolovacie scenáre.
+-->
+
+
+{% extends "template.html" %}
+
+{% block custom_includes %}  
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+{% endblock %}
+
+{% block custom_title %} Modelovanie {% endblock %}
+
+{% block custom_body_content%}
+<div id="alert-wrap"> </div>
+<div id="progress" style='display:none;'>
+    <span class="d-inline-block" tabindex="0" data-toggle="tooltip" data-placement="bottom" title="V prípade chyby skúste 'refreshnúť' stránku. V prípade zle zvolených parametrov môže dolovanie trvať dlhší časový úsek.">
+        <button class="btn btn-primary btn-lg btn-block mt-5" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="sr-only">Prebieha dolovanie znalostí z predspracovanej dátovej sady...</span>
+        </button>
+    </span>
+</div>
+<form method="POST"  class="form-group p-4 m-5 h-auto mx-auto" id="mining">
+    <div class="d-grid gap-2 mt-5 mb-3">
+        <h5>1. Výber scenára</h5>
+        <input name='processed_file' id='processed_file' style='display:none'>
+        <div class='m-4'>
+            <div class="form-check form-check-inline mx-5">
+                <input class="form-check-input" type="radio" name="scenario" id="clustering" value="1">
+                <label class="form-check-label" for="clustering">Zhlukovanie</label>
+            </div>
+            <div class="form-check form-check-inline mx-5">
+                <input class="form-check-input" type="radio" name="scenario" id="combination" value="2">
+                <label class="form-check-label" for="combination">Zhlukovanie + Asociačné pravidlá</label>
+            </div>
+            <div class="form-check form-check-inline mx-5">
+                <input class="form-check-input" type="radio" name="scenario" id="rules" value="3">
+                <label class="form-check-label" for="rules">Asociačné pravidlá</label>
+            </div>
+            <div class="form-check form-check-inline mx-5">
+                <input class="form-check-input" type="radio" name="scenario" id="sequential-patterns" value="4">
+                <label class="form-check-label" for="sequential-patterns">Sekvenčné vzory</label>
+            </div>
+            <div class="form-check form-check-inline mx-5">
+                <input class="form-check-input" type="radio" name="scenario" id="clsq" value="5">
+                <label class="form-check-label" for="clsq">Zhlukovanie + Sekvenčné vzory</label>
+            </div>
+            <div class="form-select mt-5 w-75 mx-auto" id='clustering-algo' style='display:none'>
+                <label for="algo">2.Výber algoritmu pre zhlukovanie</label>
+                <select class="form-control" name='cluster_algo' id='cluster_algo'>
+                    <option disabled selected value id='base'> -- vyberte možnosť -- </option>
+                    <option value='Birch' >Birch</option>
+                    <option value='K-means'>K-means</option>
+                    <option value='DBSCAN'>DBSCAN</option>
+                </select>
+            </div>
+            <div class="form-select mt-5 w-75 mx-auto" id='fp-algo' style='display:none'>
+                <label for="fp-algo-select">2.Výber algoritmu pre generovanie frekventovaných množín</label>
+                <select class="form-control" name='fp-algo-select' id='fp-algo-select'>
+                    <option disabled selected value id='base'> -- vyberte možnosť -- </option>
+                    <option value='Apriori' >Apriori</option>
+                    <option value='FP-Growth'>FP Growth</option>
+                </select>
+            </div>
+            <div class="form-select mt-5 w-75 mx-auto" id='sp-algo' style='display:none'>
+                <label for="sp-algo-select">2.Výber algoritmu pre generovanie sekvenčných vzorov</label>
+                <select class="form-control" name='sp-algo-select' id='fp-algo-select'>
+                    <option disabled selected value id='base'> -- vyberte možnosť -- </option>
+                    <option value='PrefixSpan' >PrefixSpan </option>
+                </select>
+            </div>
+            <div class='w-75 mx-auto' id='Birch-options' style="display:None;">
+                <div class="row mt-5">
+                    <h6> 3. Špecifikácia parametrov pre zhlukovanie.</h6>
+                </div>
+                <div class='row'>
+                    <div class="col">
+                    <label for='treshold'>Prah</label>
+                    <input type="number" class="form-control" id="treshold" name="treshold" placeholder="Prah" value=0.3 step=0.01 min=0.01>
+                    </div>
+                    <div class="col">
+                    <label for='branching-factor'>Vyvažovací faktor</label>
+                    <input type="number" class="form-control" id="branching-factor" name="branching-factor" placeholder="Faktor vetvenia" value=50 min=1 step=1>
+                    </div>
+                    <div class="col">
+                        <label for='b_clusters'>Počet zhlukov</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">
+                                <span class="d-inline-block" tabindex="0" data-toggle="tooltip" data-placement="bottom" title="Algoritmus BIRCH nepotrebuje dopredu špecifikovať počet zhlukov. Pre nešpecfikovanie počtu zhlukov nechajte hodnotu tohto vstupu na 0.">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-info" viewBox="0 0 16 16">
+                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <input type="number" class="form-control" id="b_clusters" name="b_clusters" placeholder="Počet zhlukov" value=0 min=0 step=1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='w-75 mx-auto' id='K-Means-options' style="display:None;">
+                <div class="row mt-5">
+                    <h6> 3. Špecifikácia parametrov pre zhlukovanie.</h6>
+                </div>
+                <div class='row'>
+                    <div class="col">
+                        <label for='k_clusters'>Počet zhlukov</label>
+                        <input type="number" class="form-control" id="k_clusters" name="k_clusters" placeholder="Počet zhlukov" value=3 min=2 step=1>
+                    </div>
+                </div>
+            </div>
+            <div class='w-75 mx-auto' id='DBSCAN-options' style="display:None;">
+                <div class="row mt-5">
+                    <h6> 3. Špecifikácia parametrov pre zhlukovanie.</h6>
+                </div>
+                <div class='row'>
+                    <div class="col">
+                        <label for='db_eps'>Epsilon (polomer okolia)</label>
+                        <input type="number" class="form-control" id="db_eps" name="db_eps" placeholder="Epsilon" value=0.25 step=0.01 min=0.01>
+                    </div>
+                    <div class="col">
+                        <label for='db_samples'>Minimálny počet bodov v okolí jadrového bodu</label>
+                        <input type="number" class="form-control" id="db_samples" name="db_samples" placeholder="Minimálny počet vzoriek" value=5 min=1 step=1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='w-75 mx-auto' id='AR-options' style="display:None;">
+            <div class="row mx-2 my-1">
+                <h6 class='mr-4'>3. Špecifikácia parametrov pre dolovanie frekventovaných vzorov/asociačných pravidiel.</h6>
+            </div>
+            <div class='row mx-2'>
+                <div class="col">
+                <label for='support'>Minimálna podpora</label>
+                <input type="number" class="form-control" id="support" name="support" placeholder="Minimálna podpora" value=0.25 step=0.01 min=0.01 max=1.00>
+                </div>
+                <div class="col">
+                <label for='confidence'>Minimálna spoľahlivosť</label>
+                <input type="number" class="form-control" id="confidence" name="confidence" placeholder="Minimálna spoľahlivosť" value=0.55 step=0.01 min=0.01 max=1.00>
+                </div>
+            </div>
+        </div>
+        <div class='w-75 mx-auto px-2' id='SP-options' style="display:None;">
+            <div class="row mt-4 mb-2">
+                <h6>3. Špecifikácia parametrov pre dolovanie sekvenčnych vzorov.</h6>
+            </div>
+            <div class='row'>
+                <div class="col">
+                    <label for='ps_min_support'>Minimálna podpora</label>
+                    <input type="number" class="form-control" id="k_clusters" name="ps_min_support" placeholder="Minimálna podpora" value=0.2 step=0.01 min=0.01 max=1.00>
+                </div>
+                <div class="col">
+                    <label for='ps_min_len'>Minimálna dĺžka sekvencie</label>
+                    <input type="number" class="form-control" id="k_clusters" name="ps_min_len" placeholder="Minimálna dĺžka" value=2 step=1 min=1>
+                </div>
+            </div>
+        </div>
+    
+        <button type="submit" class="btn btn-dark btn-lg mt-4 w-75 mx-auto" id="process_mine">Spracovať scenár</button>
+    </div>
+</form>
+<div id='charts' class='charts mt-5' style="max-width: 90%;">
+  
+    <div class='row' id='cluster_title' style='display:None;'>
+        <h4>Zhluková analýza</h4>
+    </div>
+    <div class='row'>
+        <div class='col-8' id='cluster'></div>
+        <div class='col-4' id='cluster_table'></div>
+    </div>
+
+    <div class='row' id='as_title' style='display:None;'>
+        <h4>Asociačné pravidlá</h4>
+    </div>
+    <div class='row'>
+        <div id='as-r-table'></div>
+    </div>
+    <div class='row' id='cluster_as_title' style='display:None;'>
+        <h4>Asociačné pravidlá po zhlukovaní</h4>
+    </div>
+    <div class='row'>
+        <div id='cluster-as-r-table'></div>
+    </div>
+    <div class='row' id='seq_title' style='display:None;'>
+        <h4>Sekvenčné vzory</h4>
+    </div>
+    <div class='row'>
+        <div id='sequential_pattern'></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_ajax %}
+<script>
+    $(document).ready(function() {
+        var params = new URLSearchParams(window.location.search);
+        $('input#processed_file').val(params.get('file'));
+    });
+
+    function set_select_to_base(){
+        // nastavenie selectov do povodnej moznosti
+        $('select#cluster_algo option:contains(" -- vyberte možnosť -- ")').prop('selected',true);
+        $('select#fp-algo-select option:contains(" -- vyberte možnosť -- ")').prop('selected',true);
+        $('select#sp-algo option:contains(" -- vyberte možnosť -- ")').prop('selected',true);
+    }
+
+    $('#cluster_algo').change(function(){
+        // sprava formularu pre ziskavanie znalosti po vybere zhlukovacieho algoritmu
+        if($(this).val() == 'Birch'){
+            $('#Birch-options').show();
+            $('#K-Means-options').hide();
+            $('#DBSCAN-options').hide();
+        } else if($(this).val() == 'K-means') {
+            $('#K-Means-options').show();
+            $('#Birch-options').hide();
+            $('#DBSCAN-options').hide();
+        } else if($(this).val() == 'DBSCAN') {
+            $('#DBSCAN-options').show();
+            $('#K-Means-options').hide();
+            $('#Birch-options').hide();
+        }
+    });
+
+    $('#fp-algo-select').change(function(){
+        // sprava formularu po vybere algoritmu pre dolovanie frekventovanych vzorov
+        if($(this).val() == 'Apriori' || $(this).val() == 'FP-Growth') {
+            $('#AR-options').show();
+        }
+    })
+
+    $('#clustering').change(function(){
+        // sprava formulara po vybere zhlukovacieho scenara
+        if(this.checked) {
+            $('#clustering-algo').show();
+            const divs = ['#K-Means-options','#Birch-options','#DBSCAN-options','#AR-options', '#SP-options', '#fp-algo', '#sp-algo'];
+            for(div of divs) {
+                if($(div).is(':visible')) {
+                    $(div).hide();
+                }
+            }
+            set_select_to_base();
+            if($('#AR-options').is(':visible')){
+                $('#AR-options').hide();
+            }
+            if($('#fp-algo').is(':visible')) {
+                $('#fp-algo').hide();
+            }
+        } 
+    });
+
+    $('#combination').change(function(){
+        // sprava formulara po vybere scenaru zhlukovanie + dolovanie asociacnych pravidiel
+        if(this.checked) {
+            $('#clustering-algo').show();
+            $('#fp-algo').show();
+            const divs = [ '#K-Means-options','#Birch-options','#DBSCAN-options', '#SP-options', '#AR-options', '#sp-algo'];
+            for(div of divs){
+                if($(div).is(':visible')) {
+                    $(div).hide();
+                }
+            }
+            set_select_to_base();
+        } 
+    });
+
+    $('#rules').change(function(){
+        // sprava formulara po vybere scenaru pre dolovanie frekventovanych vzorov a nasledne dolovanie asoc. pravidiel
+        if(this.checked) {
+            $('#fp-algo').show();
+            const divs = ['#clustering-algo', '#K-Means-options','#Birch-options','#DBSCAN-options', '#SP-options', '#sp-algo'];
+            for(div of divs){
+                if($(div).is(':visible')) {
+                    $(div).hide();
+                }
+            }
+            set_select_to_base();
+        }
+    });
+
+    $('#sequential-patterns').change(function(){
+        // sprava formulara po vybere scenaru pre dolovanie sekvencnych vzorov
+        if(this.checked) {
+            $('#sp-algo').show();
+            $('#SP-options').show();
+            const divs = ['#clustering-algo', '#K-Means-options','#Birch-options','#DBSCAN-options', '#fp-algo', '#AR-options'];
+            for(div of divs){
+                if($(div).is(':visible')) {
+                    $(div).hide();
+                }
+            }
+            set_select_to_base();
+        }
+    });
+
+    $('#clsq').change(function(){
+        // sprava formulara po vybere scenaru pre zhlukovanie + dolovanie sekvencnych vzorov
+        if(this.checked) {
+            $('#clustering-algo').show();
+            $('#sp-algo').show();
+            $('#SP-options').show();
+            const divs = ['#AR-options', '#K-Means-options','#Birch-options','#DBSCAN-options', '#fp-algo'];
+            for(div of divs){
+                if($(div).is(':visible')) {
+                    $(div).hide();
+                }
+            }
+            set_select_to_base();
+        }
+    });
+
+    function hide_previous_results(divs, titles) {
+        // funkcia schova predosle vydolovane znalosti
+        for(div of divs) {
+            $(div).html("");
+        }
+        for(title of titles) {
+            $(title).hide();
+        }
+    }
+
+    function wrap_alert(categ, msg) {
+        // obsluha wrapperu
+        $("#alert-wrap").html("<div class='alert alert-"+categ+" px-3' role='alert' alert-dismissible>"+msg+"<button type='button' class='btn-close float-right' data-bs-dismiss='alert'></button></div>");
+    }
+
+    $('form').on('submit', function(e) {
+        // odoslanie spracovaneho scenara a nasledna vizualizacia vydolovanych znalosti
+        e.preventDefault();
+        $("#alert-wrap").html("");
+        const titles = ['#cluster_title', '#as_title', '#cluster_as_title', '#seq_title'];
+        const plot_divs = ['#cluster', '#cluster_table', '#as-r-table', '#cluster-as-r-table', '#sequential_pattern'];
+        hide_previous_results(plot_divs, titles);
+        $('#progress').show();
+        $('#mining').hide();
+        $.ajax({
+            method : "POST",
+            url : "/mine/get_knowledge",
+            data: $('form').serialize(),
+            success: function(data, textStatus, jqXHR) {
+                $('#progress').hide();
+                $('#mining').show();
+                switch(jqXHR.status) {
+                    case 200:
+                        wrap_alert('success', data.ok);
+                        if('cluster' in data){
+                            $('#cluster_title').show();
+                            $('#cluster').show();
+                            Plotly.newPlot('cluster', JSON.parse(data.cluster) , {});
+                        }
+                        if('cluster_table' in data){
+                            Plotly.newPlot('cluster_table', JSON.parse(data.cluster_table) , {});
+                        }
+                        if('table' in data){
+                            $('#as_title').show();
+                            Plotly.newPlot('as-r-table', JSON.parse(data.table) , {});
+                        }
+                        if('cluster_rules' in data) {
+                            $('#cluster_as_title').show();
+                            Plotly.newPlot('cluster-as-r-table', JSON.parse(data.cluster_rules) , {});
+                        }
+                        if('sequential_pattern' in data){
+                            $('#seq_title').show();
+                            Plotly.newPlot('sequential_pattern', JSON.parse(data.sequential_pattern) , {});
+                        }
+                        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    break;
+                    default:
+                    case 201:
+                        wrap_alert('danger', data.error);
+                    break;
+                }
+            },
+        });
+    });
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+{% endblock %}

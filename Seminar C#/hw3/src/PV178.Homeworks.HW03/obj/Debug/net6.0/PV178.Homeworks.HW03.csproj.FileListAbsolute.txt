@@ -1,0 +1,17 @@
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\bin\Debug\net6.0\PV178.Homeworks.HW03.exe
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\bin\Debug\net6.0\PV178.Homeworks.HW03.deps.json
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\bin\Debug\net6.0\PV178.Homeworks.HW03.runtimeconfig.json
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\bin\Debug\net6.0\PV178.Homeworks.HW03.dll
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\bin\Debug\net6.0\PV178.Homeworks.HW03.pdb
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\bin\Debug\net6.0\CsvHelper.dll
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.csproj.AssemblyReference.cache
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.AssemblyInfoInputs.cache
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.AssemblyInfo.cs
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.csproj.CoreCompileInputs.cache
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.csproj.CopyComplete
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.dll
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\refint\PV178.Homeworks.HW03.dll
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.pdb
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\PV178.Homeworks.HW03.genruntimeconfig.cache
+C:\Users\GamePC\Desktop\HW3 odovzdanie\Assignment\src\PV178.Homeworks.HW03\obj\Debug\net6.0\ref\PV178.Homeworks.HW03.dll

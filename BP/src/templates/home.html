@@ -1,0 +1,90 @@
+<!--   
+    Autor: Samuel Valaštín
+    Domovská stránka s rozcestníkom a zoznamom dostupných datasetov.
+-->
+
+{% extends "template.html" %}
+
+
+{% block custom_includes %}
+
+{% endblock %}
+
+{% block custom_title %} Domovská stránka {% endblock %}
+
+{% block custom_body_content %}
+<div id='homepage-content' class='my-3 py-3 w-75 mx-auto'>
+    <h4 class='mb-3'> Rozcestník </h4>
+    <div class="list-group mb-5">
+        <a href="/" class="list-group-item list-group-item-action active"> Domovská stránka</a>
+        <a href="/preprocess" class="list-group-item list-group-item-action">Predspracovanie webových prístupových logov</a>
+        <a href="/change_folder_token" class="list-group-item list-group-item-action">Správa ukladania spracovaných rámcov/štatistík</a>
+        <a href="/processed_logs" class="list-group-item list-group-item-action">Zoznam predspracovaných logov</a>
+        <a href="/about" class="list-group-item list-group-item-action">O projekte</a>
+      </div>
+    <h4 class='mb-3 mt-3'>Dostupné datasety pre získavanie znalostí z webových prístupových logov (kliknutím stiahnete)</h4>
+    <h5 class='mb-3 mt-3'> Vzhľadom na obmedzené výkonnostné podmienky free hostingu, sú pripravené datasety menšej veľkosti.</h5>
+    <ul class="list-group">
+        <a href="/download_dataset/1" class="list-group-item list-group-item-action">COMBINED - Univerzitný informačný systém - August 2018 (vzorka s 100 000 záznamami, .gz archív)
+            <div class="source">
+            <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="https://zenodo.org/record/3241445#.YW2COPwzZhF">
+                Zdroj
+              </button>
+            </div>
+        </a>
+        <a href="/download_dataset/2" class="list-group-item list-group-item-action">COMBINED - Univerzitný informačný systém - September 2018 (vzorka s 330 000 záznamami, .gz archív)
+            <div class="source">
+                <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="https://zenodo.org/record/3241445#.YW2COPwzZhF">
+                    Zdroj
+                  </button>
+            </div>
+        </a>
+        <a href="/download_dataset/3" class="list-group-item list-group-item-action">COMBINED - Univerzitný informačný systém - September 2018 - pokračovanie (vzorka s 250 000 záznamami, .gz archív)
+            <div class="source">
+                <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="https://zenodo.org/record/3241445#.YW2COPwzZhF">
+                    Zdroj
+                  </button>
+            </div>
+        </a>
+        <a href="/download_dataset/4" class="list-group-item list-group-item-action">COMBINED - Vzorky Univerzitný informačný systém - August 2018 (100 000 + 250 000, zip archív (ukážka podpory integrácie logovacích súborov))
+            <div class="source">
+                <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="https://zenodo.org/record/3241445#.YW2COPwzZhF">
+                    Zdroj
+                  </button>
+            </div>
+        </a>
+        <a href="/download_dataset/5" class="list-group-item list-group-item-action">COMMON - Vzorka Univerzita Saskachewan, Kanada (približne 11 000 záznamov, kódovanie upravené na UTF-8, .gz archív) 
+            <div class="source">
+                <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="http://web.archive.org/web/20181017170502/http://ita.ee.lbl.gov/html/contrib/Sask-HTTP.html">
+                    Zdroj
+                  </button>
+            </div>
+        </a>
+        <a href="/download_dataset/6" class="list-group-item list-group-item-action">COMMON - Univerzita Saskachewan, Kanada - Jún (216 722 záznamov, kódovanie upravené na UTF-8, .gz archív)
+            <div class="source">
+                <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top"  title="http://web.archive.org/web/20181017170502/http://ita.ee.lbl.gov/html/contrib/Sask-HTTP.html">
+                    Zdroj
+                  </button>
+            </div>
+        </a>
+        <a href="/download_dataset/7" class="list-group-item list-group-item-action">COMMON - Univerzita Saskachewan, Kanada - Júl (228 741 záznamov, kódovanie upravené na UTF-8, .gz archív)
+            <div class="source">
+                <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top"  title="http://web.archive.org/web/20181017170502/http://ita.ee.lbl.gov/html/contrib/Sask-HTTP.html">
+                    Zdroj
+                  </button>
+            </div>
+        </a>
+        <a href="/download_dataset/8" class="list-group-item list-group-item-action">COMBINED - PHP Fusion (5378 záznamov, .gz archív), vlastný zdroj
+        </a>
+    </ul>
+</div>
+{% endblock %}
+
+{% block custom_ajax %}
+
+<script type='text/javascript'>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+{% endblock %}
