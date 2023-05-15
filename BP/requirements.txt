@@ -7,7 +7,7 @@
 # src/mine.py: 11
 # src/save.py: 16
 # src/stats.py: 1
-Flask == 2.0.2
+Flask == 2.3.2
 
 # src/save.py: 17,18
 PyDrive2 == 1.10.0
