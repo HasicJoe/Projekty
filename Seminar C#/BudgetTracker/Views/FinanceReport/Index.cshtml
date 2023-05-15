@@ -1,0 +1,195 @@
+﻿@{
+    ViewData["Title"] = "My finance report";
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success mb-2" role="alert">
+        @TempData["Message"]
+    </div>
+}
+
+
+
+<h2 class="text-center mt-5">View my current budget state</h2>
+<hr class="w-100" />
+
+<div class="w-50 text-center my-5 mx-auto">
+    @using (Html.BeginForm("MakeReport", "FinanceReport", FormMethod.Post, new { onsubmit = "makeReport(event)", id = "make-report" }))
+    {
+        <div class="form-group my-3">
+            <label for="Year" class="control-label">Select year for your finance report</label>
+            <select name="Year" id="Year" class="form-control">
+                @for (int year = DateTime.Now.Year - 1; year <= DateTime.Now.Year; year++)
+                {
+                    <option value="@year">@year</option>
+                }
+            </select>
+        </div>
+        <div class="form-group my-3">
+            <label for="Month" class="control-label">Select month for your finance report</label>
+            <select name="Month" id="Month" class="form-control">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+        </div>
+
+        <div class="form-group my-4">
+            <input type="submit" value="Make report" class="btn btn-primary" />
+        </div>
+    }
+</div>
+<div id="chart" class="position-relative" style="left: -200px;"></div>
+<div id="total-budget-chart" class="position-relative" style="left: -200px;"></div>
+<div id="day-by-day-chart" class="position-relative mb-5" style="left: -200px;"></div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        // vytvorenie chartu pre vizualizatiu totalneho pomeru vydavkov k limitom
+        function makeTotalReport(){
+            $.ajax({
+                type: 'POST',
+                url: '/FinanceReport/MakeTotalSpendingReport',
+                data: $('form#make-report').serialize(),
+                dataType: 'json',
+                success: function (response) {
+                    var spending = response.totalExpenses / response.totalLimit;
+                    var ax = {
+                        x: [spending],
+                        y: ["Total budget consumption"],
+                        type: 'bar',
+                        orientation: 'h',
+                        hovertemplate: '%{y}: %{x:.0%} of budget consumed',
+                        hoverinfo: 'y',
+                    };
+                    var barLayout = {
+                        title: 'Total budget spending across all expense categories',
+                        title_x: 0.5,
+                        xaxis: {
+                            tickformat: '%'
+                        },
+                        margin: {
+                            l: 500,
+                            r: 100,
+                            t: 200,
+                            b: 200
+                        }
+                    };
+                    Plotly.newPlot('total-budget-chart', [ax], barLayout);
+                    makeDayByDayReport();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + xhr.responseText);
+                    makeDayByDayReport();
+                }
+            });
+        }
+        
+        // vizualizacia vydavkov den po dni
+        function makeDayByDayReport(){
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/FinanceReport/MakeDayByDayReport',
+                data: $('form#make-report').serialize(),
+                dataType: 'json',
+                success: function (response) {
+                    var data = [];
+                    var dates = response.dates.map(function (dateString) {
+                        return new Date(dateString);
+                    });
+                    for (var i = 0; i < response.categories.length; i++) {
+                        var categoryData = {
+                            x: dates,
+                            y: response.expenses[i],
+                            type: 'scatter',
+                            mode: 'lines',
+                            name: response.categories[i],
+                            hovertemplate: response.categories[i] + ': $%{y:.2f} of $' + response.limits[i] + ' budget<br>%{x}',
+                        };
+                        data.push(categoryData);
+                    }
+                    var layout = {
+                        title: 'Day-by-Day Expenses',
+                        xaxis: {
+                            title: 'Date',
+                            type: 'date',
+                            tickformat: '%b %d',
+                        },
+                        yaxis: {
+                            title: 'Expense',
+                            tickprefix: '$',
+                        },
+                        margin: {
+                            l: 500,
+                            r: 100,
+                        },
+                    };
+                    Plotly.newPlot('day-by-day-chart', data, layout);
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + xhr.responseText);
+                }
+            });
+        }
+
+        // vizualizacia aktualne spotrebovaneho mnozstva vydavkov k limitom pre dane kategorie
+        function makeReport(event){
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/FinanceReport/MakeReport',
+                data: $('form#make-report').serialize(),
+                dataType: 'json',
+                success: function (response) {
+                    var spendConsumption = response.expenses.map((value, index) => value / response.limits[index]);
+                    var markerColor = spendConsumption.map(function (consumption){
+                        if (consumption > 1) {
+                            return 'red';
+                        } else {
+                            return 'green';
+                        }
+                    });
+                    var ax = {
+                        x: spendConsumption,
+                        y: response.categories,
+                        type: 'bar',
+                        orientation: 'h',
+                        hovertemplate: '%{y}: %{x:.0%} of budget consumed',
+                        hoverinfo: 'y',
+                        marker: {
+                            color: markerColor
+                        }
+                    };
+                    var barLayout = {
+                        title: 'Budget report for each existing expense category',
+                        xaxis: {
+                            tickformat: '%'
+                        },
+                        margin: {
+                            l: 500,
+                            r: 100
+                        }
+                    };
+                    Plotly.newPlot('chart', [ax], barLayout);
+                    makeTotalReport();
+                },
+                 error: function (xhr, status, error) {
+                    alert('Error: ' + xhr.responseText);
+                    makeTotalReport();
+                }
+            });
+        }
+    </script>
+}

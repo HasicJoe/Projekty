@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Login page";
+}
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success w-100" role="alert">
+        @TempData["Message"]
+    </div>
+}
+@model BudgetTracker.Models.UserLoginModel
+
+<div class="mx-auto w-50 mt-5">
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group mt-2">
+            @Html.LabelFor(m => m.UserName, labelText:"Please insert your username")
+            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.UserName)
+        </div>
+
+        <div class="form-group mt-2">
+            @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Password)
+        </div>
+        <div class="form-group mt-3 mx-auto text-center">
+            <button type="submit" class="btn btn-primary btn-lg d-inline-block">Login</button>
+        </div>
+    }
+</div>

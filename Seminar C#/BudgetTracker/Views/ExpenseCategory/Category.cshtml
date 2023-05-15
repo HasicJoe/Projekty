@@ -1,0 +1,210 @@
+﻿@{
+    ViewData["Title"] = "Expense categories managment";
+}
+
+@model BudgetTracker.Models.ExpenseCategoryModel
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success mb-2" role="alert">
+        @TempData["Message"]
+    </div>
+}
+<h2 class="text-center mt-5">Add expense category with its limit</h2>
+<hr class="w-100" />
+@using (Html.BeginForm("AddCategory", "ExpenseCategory", FormMethod.Post, new { onsubmit = "addExpenseCategory(event)", id = "add-form" }))
+{
+    <div class="w-50 mx-auto mt-5">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group mt-5">
+            @Html.LabelFor(m => m.Name, "Please insert name of expense category:")
+            @Html.TextBoxFor(u => u.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(u => u.Name, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group mt-3">
+            @Html.LabelFor(model => model.Limit,"Set monthly limit:")
+            <div class="input-group col-md-4">
+                @Html.EditorFor(model => model.Limit, new { htmlAttributes = new { @class = "form-control limit-input-field", type = "number", step = "1", min = "1"} })
+                <span class="input-group-addon bg-primary" style=" border: 1.5px solid #303030; padding-inline: 15px; padding-block: 4px;">€</span>
+            </div>
+            @Html.ValidationMessageFor(model => model.Limit, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group my-4 mx-auto text-lg-center">
+            <button type="submit" class="btn btn-primary">Add new expense category</button>
+        </div>
+    </div>
+}
+
+<h2 class="text-center my-5">My expense categories</h2>
+<hr class="w-100"/>
+<div class="container w-75 mx-auto my-5">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th class="w-50">Expense category name</th>
+            <th class="w-25">Monthly limit</th>
+            <th class="w-25">Options</th>
+        </tr>
+        </thead>
+        <tbody id="expense-category-table">
+        </tbody>
+    </table>
+</div>
+
+
+<div class="modal fade" id="edit-category-modal" tabindex="-1" role="dialog" aria-labelledby="edit-category-modal-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Expense Category</h5>
+            </div>
+            <div class="modal-body">
+                <form id="edit-category-form">
+                    <div class="form-group my-2">
+                        <label for="edit-category-id">Id</label>
+                        <input type="text" class="form-control" id="edit-category-id" name="edit-id" readonly required>
+                    </div>
+                    <div class="form-group my-2">
+                        <label for="edit-category-name">Name</label>
+                        <input type="text" class="form-control" id="edit-category-name" name="edit-name" required>
+                    </div>
+                    <div class="form-group my-2">
+                        <label for="edit-category-limit">Limit</label>
+                        <input type="number" class="form-control" id="edit-category-limit" name="edit-limit" required step="1" , min="0.01">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="hideModal()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveNewCategory()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        //nastavenie defaultnej hodnoty limitu a nacitanie uzivatelskych kategorii po nacitani stranky
+        $(document).ready(function () {
+            $('.limit-input-field').val('100');
+            categoryFetch();
+        });
+        
+        //nacitanie dat do tabulky uzivatelskych vydavkovych kategorii
+        function categoryFetch(){
+            $.ajax({
+                url: '/ExpenseCategory/GetUserExpensesCategory',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // vycistene predchadzajucich zaznamov
+                    $('#expense-category-table').empty();
+                    // spracovanie nacitanych dat
+                    $.each(data, function (index, item) {
+                        var row = '<tr>' +
+                                    '<td class="w-50">' + item.name + '</td>' +
+                                    '<td lass="w-25">' + item.limit + '</td>' +
+                                    '<td lass="w-25">' +
+                                        '<button class="btn btn-primary edit-category mx-1" data-id="' + item.id + '">Edit</button>' +
+                                        '<button class="btn btn-secondary delete-category mx-1" data-id="' + item.id + '">Delete</button>' +
+                                    '</td>' +
+                                  '</tr>';
+                        $('#expense-category-table').append(row);
+                    });
+                    // pridanie event listeneru pre edit tlacidla
+                    $('.edit-category').click(function () {
+                        var categoryId = $(this).data('id');
+                        editCategory(categoryId);
+                    });
+                    // pridanie event listeneru pre delete tlacidla
+                    $('.delete-category').click(function () {
+                        var categoryId = $(this).data('id');
+                        deleteCategory(categoryId);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + xhr.responseText);
+                }
+            });
+        }
+        
+        // pridanie noveho zaznamu
+        function addExpenseCategory(event){
+            console.log($('form#add-form').serialize());
+            event.preventDefault();
+            $.ajax({
+                url: '/ExpenseCategory/AddCategory',
+                type: 'POST',
+                data: $('form#add-form').serialize(),
+                success: function() {
+                    setTimeout(() => {
+                        categoryFetch();
+                    }, 1500);
+                    // vyprazdenie formu po pridani kategorie
+                    document.getElementById("add-form").reset();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + xhr.responseText);
+                }
+            });
+        }
+        
+        // vymazanie existujuceho zaznamu
+        function deleteCategory(id){
+            alert('Are you sure you want to delete expense category?');
+            $.ajax({
+                url: '/ExpenseCategory/DeleteExpenseCategory/' + id,
+                type: 'GET',
+                success: function () {
+                    setTimeout(() => {
+                        categoryFetch();
+                    }, 1500);
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + xhr.responseText);
+                }
+            });
+        }
+
+        // uprava existujuceho zaznamu - nacitanie modalneho okna
+        function editCategory(categoryId){
+            $.ajax({
+                url: '/ExpenseCategory/GetExpenseCategory/' + categoryId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (category) {
+                    $('#edit-category-id').val(category.id);
+                    $('#edit-category-name').val(category.name);
+                    $('#edit-category-limit').val(category.limit);
+                    $('#edit-category-modal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + xhr.responseText);
+                }
+            });
+        }
+        // skrytie modalneho okna
+        function hideModal(){
+            $('#edit-category-modal').modal('hide');
+        }
+        
+        // ulozenie editovaneho zaznamu
+        function saveNewCategory(){
+            $.ajax({
+                url: '/ExpenseCategory/UpdateExpenseCategory',
+                type: 'POST',
+                data: $('#edit-category-form').serialize(),
+                success: function () {
+                    hideModal();
+                    setTimeout(() => {
+                        categoryFetch();
+                    }, 1500);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#error-alert').html('<div class="alert alert-danger mb-2" role="alert">' + jqXHR.responseText + '</div>');
+                }
+            });
+        }
+    </script>
+}
